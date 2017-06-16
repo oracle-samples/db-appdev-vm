@@ -69,29 +69,3 @@ Timings:
 
 Minimum (Oracle Linux + Oracle Database)  
 Total time 60 mins (accounted for time + 7 mins rounding error / ignore <2 minute).  
-
-boot,8  
-yum update,14  
-reboot ,3  
-run database software install (not database build),3   
-dbca (database build),7  
-password and 32kvarchar2,6  
-shrink (fill disk with 0 for easy compression),3  
-1 x 3 minute reboot + shutdown + minor <1 minute stuff,10  
-
-Maximum (Including all optional extras APEX/ORDS/((internal) demos)  
-Total time 113.5 mins (Accounted for time + 10.5 mins rounding error / ignore <2 minute).  
-boot,9  
-yum update,14  
-reboot,3  
-run database software install (not database build),4  
-dbca (database build),8  
-password and 32kvarchar <should be same as minimum?>,18  
-apex install ,16  
-ords install ,4  
-set up demos and run demo reset,18  
-shrink (fill disk with 0 for easy compression),2  
-1 x 3 minute reboot + shutdown + minor <1 minute stuff - this is too long,9  
-
-Removing the shrink.sh if not exporting - fills disk with 0 for easy compression.  
-Run shrink.sh over ssh if subsequently exporting to ova (brings ova file down 60% in size to under 8Gb)
