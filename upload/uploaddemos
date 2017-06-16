@@ -1,0 +1,98 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License. 
+# 
+
+#################################################################################
+#
+# File: uploaddemos
+#
+# Description: upload demos into pdb from master.zip (if supplied) end user visible so not given hard to type rename.
+#
+#################################################################################
+
+
+#set -x 
+# VM SPECIFIC/ testing only/ not for production use
+export TWO_TASK=
+export BASESEED=/u01/app/oracle/oradata/orcl12c
+export DEFAULTNEWPDBNAME=ORCL
+export CONNECT=/
+export TNSNAMESFILE=$ORACLE_HOME/network/admin/tnsnames.ora
+export THEPORT=1521
+export ADMINUSER=oracle
+export ADMINPASSWORD=oracle
+export USERSTABLESPACESIZE=50M
+if test -f /u01/userhome/oracle/unzipdemos/master.zip
+then
+export NOOP=NOOP
+else
+echo ERROR Sample schemas not available in /u01/userhome/oracle/unzipdemos/master.zip
+exit 1
+fi
+#notes for test VM '$1' is the wanted pdb
+#note you could use CONNECT=sys/password@SOME_TNS_ENTRY (and update BASESEED) - the text 'as sysdba' is added on CONNECT use (TNSNAMES entry update would be local, and 32k test would fail if pdbseed not already updated)
+#plan create pdb/set password do not expire/32kvarchar/pdb open by default/on success put entry in '$ORACLE_HOME/network/admin/tnsnames.ora' approximate cost 4gb disk space or less
+#show vdb| grep PDB?? whenever sqlerror exit 1 whenever oserror exit 1 for now
+export PDB=$1
+if test "m$PDB" = "m"
+then
+  export PDB=$DEFAULTNEWPDBNAME
+fi
+#todo check pdb exist ? for now let sql exit on error
+
+cd /u01/userhome/oracle/unzipdemos
+rm -rf /home/oracle/unzipdemos/db-sample-schemas-master
+if test -d /home/oracle/unzipdemos/db-sample-schemas-master
+then
+echo samples unzipped
+cd db-sample-schemas-master
+else
+unzip master.zip
+cd db-sample-schemas-master
+mkdir log
+perl -p -i.bak -e 's#__SUB__CWD__#'$(pwd)'#g' *.sql */*.sql */*.dat 
+fi
+echo "alter pluggable database $PDB open;
+alter session set container=$PDB;
+@/u01/userhome/oracle/unzipdemos/db-sample-schemas-master/mksample oracle oracle oracle oracle oracle oracle oracle oracle USERS TEMP /tmp/ localhost:$THEPORT/$PDB
+exit 0
+" | sqlplus $CONNECT as sysdba
+export THEEXIT=$?
+cd /home/oracle
+rm -rf /home/oracle/unzipdemos/db-sample-schemas-master
+if test $THEEXIT -ne 0
+then
+echo EXITTED WITH $THEEXIT
+else 
+echo granting dba to av schema - should restrict privileges to what privileges are required.
+echo "drop user av cascade;
+grant dba to av identified by oracle;
+connect av/oracle@localhost:$THEPORT/$PDB
+@/home/oracle/bin/livesql_create_av_schema.sql
+exit;"|sqlplus system/oracle@localhost:$THEPORT/$PDB
+echo "create or replace trigger EMPLOYEES_EMPLOYEE_ID_TRG
+before insert on employees
+for each row
+begin
+  if :new.employee_id is null then
+    select employees_seq.nextval into :new.employee_id from sys.dual;
+  end if;
+end;
+/
+"| sqlplus hr/oracle@localhost:$THEPORT/$PDB
+fi
+exit $THEEXIT

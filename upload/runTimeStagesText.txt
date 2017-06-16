@@ -1,0 +1,15 @@
+1updateLinux.sh PROGRESS: 1/4 1updateLinux.sh - first script run - from plain iso. Set up second drive. DONT ECHOED BY HAND IN 1updateLinux.sh
+2afterFirstReboot.sh PROGRESS: 2/4 2afterFirstReboot.sh  - after first reboot - before any oracle database software installed. (install virtual box guest additions).
+3topLevel.sh PROGRESS: 3/4 3topLevel.sh - main kick off script i.e. yum and call subscripts
+3_1installDbtoolClientTools.sh PROGRESS: 3_1/4 3_1installDbtoolClientTools.sh - install dbtool client tools
+3_2installDatabase.sh PROGRESS: 3_2/4 3_2installDatabase.sh - install the database
+3_3passwordDoNotExpire.sh PROGRESS: 3_3/4 3_3passwordDoNotExpire.sh - minor helper - e.g. passwords do not expire.
+3_4enableGeoRaster.sh PROGRESS: 3_4/4 3_4enableGeoRaster.sh - post database install and patch
+3_5unzipLabDemos.sh PROGRESS: 3_5/4 3_5unzipLabDemos.sh - demos (labs)
+3_6apexInstall.sh PROGRESS: 3_6/4 3_6apexInstall.sh - apex install
+3_7ORDSInstall.sh PROGRESS: 3_7/4 3_7ORDSInstall.sh - ords install
+3_8setupDemos.sh PROGRESS: 3_8/4 3_8setupDemos.sh - set up demos and run reset scripts
+
+
+
+

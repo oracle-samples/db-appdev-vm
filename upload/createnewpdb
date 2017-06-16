@@ -1,0 +1,155 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License. 
+# 
+
+#################################################################################
+#
+# File: createnewpdb
+#
+# Description: as title - user script so no long descriptive rename 
+#
+#################################################################################
+
+
+#set -x 
+# VM SPECIFIC/ testing only/ not for production use
+export BASESEED=/u01/app/oracle/oradata/orcl12c
+export DEFAULTNEWPDBNAME=ORDS
+export CONNECT=/
+export TNSNAMESFILE=$ORACLE_HOME/network/admin/tnsnames.ora
+export THEPORT=1521
+export ADMINUSER=oracle
+export ADMINPASSWORD=oracle
+export USERSTABLESPACESIZE=50M
+#notes for test VM '$1' is the wanted pdb
+#note you could use CONNECT=sys/password@SOME_TNS_ENTRY (and update BASESEED) - the text 'as sysdba' is added on CONNECT use (TNSNAMES entry update would be local, and 32k test would fail if pdbseed not already updated)
+#plan create pdb/set password do not expire/32kvarchar/pdb open by default/on success put entry in '$ORACLE_HOME/network/admin/tnsnames.ora' approximate cost 4gb disk space or less
+#show vdb| grep PDB?? whenever sqlerror exit 1 whenever oserror exit 1 for now
+echo "THIS WILL UNSET TWO_TASK AND CONNECT AS sqlplus $CONNECT as sysdba TO YOUR DATABASE and run sql...  
+pdb being created admin user $ADMINUSER 
+press y to proceed will cost about 1.1GB disk space and take about 2 minutes [y/n]"
+read line
+if test "m$line" != "my"
+then
+echo $line is not y
+exit 1
+fi
+
+export PDB=$1
+if test "m$PDB" = "m"
+then
+  export PDB=$DEFAULTNEWPDBNAME
+fi
+#todo check pdb exist ? for now let sql exit on error
+if test -f /home/oracle/unzipdemos/master.zip
+then
+export NOOP=NOOP
+else 
+echo Warning demo schema not being installed as not present at /home/oracle/unzipdemos/master.zip
+export EXITEARLY="exit 0"
+fi
+if test "m$EXITEARLY" = "m"
+then
+export TWO_TASK=
+cd /home/oracle/unzipdemos
+if test -d /home/oracle/unzipdemos/db-sample-schemas-master
+then
+echo samples unzipped
+cd db-sample-schemas-master
+else
+unzip master.zip
+cd db-sample-schemas-master
+mkdir log
+perl -p -i.bak -e 's#__SUB__CWD__#'$(pwd)'#g' *.sql */*.sql */*.dat 
+#ln -s `pwd`/db-sample-schemas-master __SUB__CWD__
+#HR only - OE mkdirs etc on the file system - not multiple pdb friendly
+cp /home/oracle/unzipdemos/db-sample-schemas-master/human_resources/hr_main.sql  /home/oracle/unzipdemos/db-sample-schemas-master/human_resources/hr_main.sql.noexit
+(cat /home/oracle/unzipdemos/db-sample-schemas-master/human_resources/hr_main.sql.noexit ; echo "
+exit 0") > /home/oracle/unzipdemos/db-sample-schemas-master/human_resources/hr_main.sql
+fi
+fi
+echo "whenever sqlerror exit 1;
+whenever oserror exit 1;
+set echo on 
+set verify on
+CREATE PLUGGABLE DATABASE $PDB  admin user $ADMINUSER IDENTIFIED BY $ADMINPASSWORD  
+  DEFAULT TABLESPACE USERS
+    DATAFILE '$BASESEED/$PDB/users01.dbf' SIZE $USERSTABLESPACESIZE AUTOEXTEND ON
+  FILE_NAME_CONVERT = ('$BASESEED/pdbseed/', '$BASESEED/$PDB/');
+alter pluggable database $PDB open;
+alter session set container=$PDB;
+--up by default
+alter pluggable database $PDB save state;
+--no password expire - testing only... remove if this is not required
+alter profile DEFAULT limit password_life_time UNLIMITED;
+--this will error if 32k not in seed remove if 32k check not needed/add 32k setup (not checked) if 32k needed and pdbseed not updated add (alpha) 32kinstall code below (shuts down starts up)
+create table t_almostunique ( x varchar(32767) );
+insert into 
+t_almostunique values ( rpad('*',32000,'*') );
+select length(x) from t_almostunique;
+drop table t_almostunique;
+--32kvarchar2 on new pluggable might not even need full cdb stop/start actually this is set in pdbDOLLARseed on VM and cdb on VM - need to confirm 32k works on newly created VM pdb without this code - CONFIRMED
+--alter session set container=CDB"'$'"ROOT;
+--IGNORE FOR VM START
+--shutdown immediate
+--startup upgrade
+--alter pluggable database $PDB open upgrade;
+--alter session set container=$PDB;
+--alter system set max_string_size=EXTENDED;
+--@?/rdbms/admin/utl32k.sql 
+--alter session set container=CDB"'$'"ROOT;
+--shutdown immediate
+--startup
+--IGNORE FOR VM END
+--create HR
+--drops before create
+whenever sqlerror continue
+--host commant auto exits
+whenever oserror continue
+$EXITEARLY
+@/home/oracle/unzipdemos/db-sample-schemas-master/mksample oracle oracle oracle oracle oracle oracle oracle oracle USERS TEMP /tmp/ localhost:$THEPORT/$PDB
+select 'HR schema only installed' from dual;
+exit 0
+" | sqlplus $CONNECT as sysdba
+export THEEXIT=$?
+if test $THEEXIT -ne 0
+then
+echo EXITTED WITH $THEEXIT
+else 
+echo "create or replace trigger EMPLOYEES_EMPLOYEE_ID_TRG
+before insert on employees
+for each row
+begin
+  if :new.employee_id is null then
+    select employees_seq.nextval into :new.employee_id from sys.dual;
+  end if;
+end;
+/
+"| sqlplus hr/oracle@localhost:1521/$PDB
+echo adding entry to $TNSNAMESFILE
+echo "
+$PDB = 
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = $THEPORT))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = $PDB)
+    )
+  )
+" >> $TNSNAMESFILE
+fi
+exit $THEEXIT
