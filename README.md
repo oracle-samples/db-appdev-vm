@@ -49,6 +49,12 @@ update servers. optional export to export the ova.
 
 ![packer build](images/packerbuild.png)
 
+Output Directory
+----------------
+
+After building you can find the built OVA in the output directory.
+If you want the Oracle prebuilt OVA you can find it on Oracle Technology Network (OTN) [here](http://www.oracle.com/technetwork/database/enterprise-edition/databaseappdev-vm-161299.html)
+
 Build Structure
 --------------------
 
