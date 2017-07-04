@@ -137,9 +137,10 @@ then
     if test -f storm.dmp
     then
         echo storm.zip already unzipped
+    else
+        echo unzipping storm.zip
+        unzip storm.zip  >> storm_vm_log 2>&1
     fi
-    echo unzipping storm.zip
-    unzip storm.zip  >> storm_vm_log 2>&1
     echo importing storm.dmp
     imp storm/oracle@ORDS FILE=storm.dmp FULL=Y  >> storm_vm_log 2>&1
 fi 
