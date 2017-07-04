@@ -15,7 +15,9 @@ Mandatory Downloads
 **These two downloads are mandatory**.  If they are not here, the build will not start.
 
 * OracleLinux-R7-U3-Server-x86_64-dvd.iso (needs to be this exactly md5 checked)
+* see : http://edelivery.oracle.com/linux (I cannot give more direct link - as (free) login required + need to be over 18)
 * linux\*122*_database.zip (12201 has been verified - silent install may be incompatible with later versions)
+* see :  http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html# - (free) login required to accept license
 
 Optional Downloads
 --------------
