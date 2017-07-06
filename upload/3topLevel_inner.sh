@@ -132,20 +132,31 @@ set echo on
 grant dba, connect , resource, unlimited tablespace, create session to storm identified by oracle;
 EOF
 cd ~/storm
-if test -f storm.zip
+if test "m$VM_DO_STORM" != "m"
 then
-    if test -f storm.dmp
+    if test -f storm.zip
     then
-        echo storm.zip already unzipped
-    else
-        echo unzipping storm.zip
-        unzip storm.zip  >> storm_vm_log 2>&1
+        if test -f storm.dmp
+        then
+            echo storm.zip already unzipped
+        else
+            echo unzipping storm.zip
+            unzip storm.zip  >> storm_vm_log 2>&1
+        fi
+        echo importing storm.dmp
+        imp storm/oracle@ORDS FILE=storm.dmp FULL=Y  >> storm_vm_log 2>&1
     fi
-    echo importing storm.dmp
-    imp storm/oracle@ORDS FILE=storm.dmp FULL=Y  >> storm_vm_log 2>&1
-fi 
+else
+    echo storm import skipped as VM_DO_STORM environmental variable not set
+fi
 echo End of Import">~oracle/bin/newpdbords
-chmod 755 ~oracle/bin/newpdbords' > /tmp/hrrest.sh
+echo "#!/bin/bash
+#storm import skipped in newpdbords unless this env variable is set
+export VM_DO_STORM=yes
+~oracle/bin/newpdbords
+"> ~oracle/bin/newpdbordsstorm
+chmod 755 ~oracle/bin/newpdbords
+chmod 755 ~oracle/bin/newpdbordsstorm' > /tmp/hrrest.sh
 chmod 755 /tmp/hrrest.sh
 su - oracle -c '/bin/bash -xc /tmp/hrrest.sh'
 rm /tmp/hrrest.sh
