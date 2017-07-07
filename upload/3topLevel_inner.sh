@@ -220,7 +220,7 @@ service oracle stop
 rm /tmp/asoracle
 
 #if apex installed remove 12.2 apex
-if test -f ~oracle/apex
+if test -d ~oracle/apex
 then
     rm -rf $ORACLE_HOME/apex 
 fi
