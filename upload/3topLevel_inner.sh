@@ -129,7 +129,9 @@ echo create second ORDS pdb takes two minutes on intel i5
 echo y |~/bin/createnewpdbminhr
 echo Spatial storm data can be loaded with loadstorm script
 ">~oracle/bin/newpdbords
-chmod 755 ~oracle/bin/newpdbords' > /tmp/hrrest.sh
+cp /tmp/1/loadstorm ~oracle/bin/loadstorm
+chmod 755 ~oracle/bin/newpdbords
+chmod 755 ~oracle/bin/loadstorm' > /tmp/hrrest.sh
 chmod 755 /tmp/hrrest.sh
 su - oracle -c '/bin/bash -xc /tmp/hrrest.sh'
 rm /tmp/hrrest.sh
