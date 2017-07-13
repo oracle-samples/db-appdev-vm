@@ -11,7 +11,7 @@ then
     mv /home/oracle/bin/newpdbords  /home/oracle/bin/newpdbords.x 
 #put on top - unzip
     (echo '#!/bin/bash
-if test -f /home/oracle/Desktop/Database_Track/coffeeshop
+if test -d /home/oracle/Desktop/Database_Track/coffeeshop
 then
 echo coffeeshopApp already unzipped
 else 

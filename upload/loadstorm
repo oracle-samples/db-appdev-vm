@@ -1,0 +1,23 @@
+#!/bin/bash
+cd ~/storm
+export THEPDB="$1"
+if test "m$THEPDB" = "m"
+then
+    export THEPDB=ORDS
+fi
+sqlplus system/oracle@$THEPDB <<EOF
+set echo on
+grant dba, connect , resource, unlimited tablespace, create session to storm identified by oracle;
+EOF
+if test -f storm.zip
+then
+   if test -f storm.dmp
+   then
+       echo storm.zip already unzipped
+   else  
+       echo unzipping storm.zip
+       unzip storm.zip  >> storm_vm_log 2>&1
+   fi
+   echo importing storm.dmp
+   imp storm/oracle@$THEPDB FILE=storm.dmp FULL=Y  >> storm_vm_log 2>&1
+fi 

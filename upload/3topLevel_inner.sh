@@ -127,25 +127,11 @@ echo "#!/bin/bash
 cd ~oracle
 echo create second ORDS pdb takes two minutes on intel i5
 echo y |~/bin/createnewpdbminhr
-sqlplus system/oracle@ORDS <<EOF
-set echo on
-grant dba, connect , resource, unlimited tablespace, create session to storm identified by oracle;
-EOF
-cd ~/storm
-if test -f storm.zip
-then
-    if test -f storm.dmp
-    then
-        echo storm.zip already unzipped
-    else
-        echo unzipping storm.zip
-        unzip storm.zip  >> storm_vm_log 2>&1
-    fi
-    echo importing storm.dmp
-    imp storm/oracle@ORDS FILE=storm.dmp FULL=Y  >> storm_vm_log 2>&1
-fi 
-echo End of Import">~oracle/bin/newpdbords
-chmod 755 ~oracle/bin/newpdbords' > /tmp/hrrest.sh
+echo Spatial storm data can be loaded with loadstorm script
+">~oracle/bin/newpdbords
+cp /tmp/1/loadstorm ~oracle/bin/loadstorm
+chmod 755 ~oracle/bin/newpdbords
+chmod 755 ~oracle/bin/loadstorm' > /tmp/hrrest.sh
 chmod 755 /tmp/hrrest.sh
 su - oracle -c '/bin/bash -xc /tmp/hrrest.sh'
 rm /tmp/hrrest.sh
@@ -236,7 +222,7 @@ service oracle stop
 rm /tmp/asoracle
 
 #if apex installed remove 12.2 apex
-if test -f ~oracle/apex
+if test -d ~oracle/apex
 then
     rm -rf $ORACLE_HOME/apex 
 fi
