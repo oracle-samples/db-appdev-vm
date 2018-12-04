@@ -1,0 +1,2 @@
+#!/bin/bash
+sh /home/oracle/Desktop/Database_Track/ORDS/reset_ords.sh stop
