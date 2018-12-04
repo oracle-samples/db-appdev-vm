@@ -38,7 +38,10 @@ then
 fi
 }
 function yum_update {
-
+#turn off packagekit - sometimes conflicts with yum - not available yet but mask seems to work
+/bin/systemctl stop packagekit.service
+/bin/systemctl disable packagekit.service
+/bin/systemctl mask packagekit.service 
 yum -y update
 yum -y grouplist
 yum -y groups list
@@ -47,7 +50,7 @@ yum -y install expect
 yum -y install gcc
 yum -y install kernel-uek-devel
 yum -y install kernel-headers
-yum -y install oracle-database-server-12cR2-preinstall
+yum -y install oracle-database-preinstall-18c
 #oracle-rdbms-server-12cR2-preinstall
 usermod -a -g oinstall -G dba,wheel oracle
 #need to remove the yum proxy
@@ -86,6 +89,18 @@ systemctl set-default graphical.target
 }
 
 function setup_desktop {
+cd /tmp
+#need to move oracle user before gnome gets started
+chmod 755 /home/oracle
+#move symbolic link from under me - work or fail fast
+mkdir /u01/userhome
+chmod 755 /u01/userhome
+cp -Rp /home/* /u01/userhome
+chmod 755 /u01/userhome/*
+#sometimes fails (10% of builds) if process running
+ps -ef | grep oracle
+rm -rf /home
+ln -s /u01/userhome /home
 #need a reboot (or finish) after extras install. check by lsmod | grep vbox
 su - oracle -c "bash -c 'mkdir ~/.config'"
 su - oracle -c "bash -c 'mkdir ~/Desktop; echo images>>~/Desktop/.hidden; echo style.css>>~/Desktop/.hidden'"
@@ -101,7 +116,7 @@ Name[en_US]=Click here to Start Labs
 Exec=/usr/bin/firefox /home/oracle/Desktop/ODDHandsOnLabs.html \n
 Name=Start Here
 Icon=/home/oracle/runTimeClickHere.png
-' > ~oracle/Desktop/'Click here to Start.desktop'"
+' > /home/oracle/Desktop/'Click here to Start.desktop'"
 else
 su - oracle -c "echo '[Desktop Entry]
 Version=1.0
@@ -112,9 +127,9 @@ Name[en_US]=Click here to Start Browser
 Exec=/usr/bin/firefox \n
 Name=Start Here
 Icon=/home/oracle/runTimeClickHere.png
-' > ~oracle/Desktop/'Click here to Start.desktop'"
+' > /home/oracle/Desktop/'Click here to Start.desktop'"
 fi
-su - oracle -c "chmod 755 ~oracle/Desktop/'Click here to Start.desktop'"
+su - oracle -c "chmod 755 ~/Desktop/'Click here to Start.desktop'"
 su - oracle -c "cp /tmp/1/runTimeClickHere.png ~oracle"
 }
 function setup_resolution {

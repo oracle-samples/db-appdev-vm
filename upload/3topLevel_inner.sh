@@ -27,19 +27,19 @@
 
 . ~oracle/runTimeStartScript.sh
 #set -x
-echo 'changes after this one will be for 12.2'
+echo 'changes after this one will be for version'
 printf '1,$ s/#Storage=auto/Storage=volatile/g\n.\nw\nq'| ed /etc/systemd/journald.conf
-chmod 755 /home/oracle
-#move symbolic link from under me - work or fail fast
-
-mkdir /u01/userhome
-chmod 755 /u01/userhome
-
-cp -Rp /home/* /u01/userhome
-chmod 755 /u01/userhome/*
-rm -rf /home
-
-ln -s /u01/userhome /home
+#moved from here to 1 updateLinux_inner - as all sorts of gnome processes get in the way when making the move
+#chmod 755 /home/oracle
+##move symbolic link from under me - work or fail fast
+#mkdir /u01/userhome
+#chmod 755 /u01/userhome
+#cp -Rp /home/* /u01/userhome
+#chmod 755 /u01/userhome/*
+##sometimes fails (10% of builds) if process running
+#ps -ef | grep oracle
+#rm -rf /home
+#ln -s /u01/userhome /home
 #just moved stuff around make sure we are in a real directory
 cd /tmp
 
@@ -80,9 +80,10 @@ bash -x /tmp/1/buildTimeRootU01Chown.sh
 #install hr minimum scripts - in demos.zip but need to be gauranteed to be there
 su oracle -c 'mkdir ~/ReBuildScriptSQLDev_HR && cp /tmp/1/hr_* ~/ReBuildScriptSQLDev_HR'
 su oracle -c '/bin/bash -lc /tmp/1/3_2installDatabase.sh'
-bash /u01/installervb/orainstRoot.sh
-bash /u01/app/oracle/product/12.2/db_1/root.sh
-cat /u01/app/oracle/product/12.2/db_1/install/root_vbgeneric_*.log
+#bash /u01/installervb/orainstRoot.sh
+bash /u01/app/oraInventory/orainstRoot.sh
+bash /u01/app/oracle/product/version/db_1/root.sh
+#cat /u01/app/oracle/product/12.2/db_1/install/root_vbgeneric_*.log
 su oracle -c '/bin/bash -lc /tmp/1/buildTimeCallDBCA.sh'
 cp /tmp/1/runTimeOracleOnReboot.sh /etc/init.d/oracle
 chmod 755 /etc/init.d/oracle
@@ -103,7 +104,7 @@ su oracle -c '/bin/bash -lc /tmp/1/3_3passwordDoNotExpire.sh'
     su oracle -c '/bin/bash -lc /tmp/1/3_5unzipLabDemos.sh'
     su oracle -c '/bin/bash -lxc /tmp/1/3_6apexInstall.sh'
     su oracle -c '/bin/bash -lxc /tmp/1/3_7ORDSInstall.sh'
-    su oracle -c '/bin/bash -lxc /tmp/1/buildTimeSetupRestClient.sh'
+    #do this in database client set up 3_1installDbtoolClientTools_inner.sh su oracle -c '/bin/bash -lxc /tmp/1/buildTimeSetupRestClient.sh'
 /etc/init.d/oracle stop
 
 su - oracle -c 'cp /tmp/1/nuketimestamps ~oracle/bin/nuketimestamps'
@@ -201,6 +202,14 @@ echo 'firefox &
 sleep 10
 kill -15 %1
 exit' | bash &
+export LD_LIBRARY_PATH=
+#cd ~/DESKTOP
+#dbus-launch gio set "Rest Client.desktop" "metadata::trusted" yes
+#dbus-launch gio set "SQL Developer.desktop" "metadata::trusted" yes
+#dbus-launch gio set "Oracle-datamodeler.desktop" "metadata::trusted" yes
+#dbus-launch gio set "Click here to Start.desktop" "metadata::trusted" yes
+#dbus-launch gio set "sql.desktop" "metadata::trusted" yes
+#this stopped working copying it to on gnome login
 dbus-launch gsettings set org.gnome.desktop.session idle-delay 0
 dbus-launch gsettings set org.gnome.desktop.screensaver lock-enabled false
 dbus-launch gsettings set org.gnome.desktop.background picture-uri ''
@@ -210,7 +219,7 @@ chmod 755 /tmp/asoracle
 su - oracle -c '/bin/bash -xc /tmp/asoracle'
 rm /tmp/asoracle 
 
-export ORACLE_HOME=/u01/app/oracle/product/12.2/db_1
+export ORACLE_HOME=/u01/app/oracle/product/version/db_1
 #force firefox initial state for jsonview. hacky.
 echo "bash /tmp/1/buildTimeCheckVersion.sh before_remove
 " > /tmp/asoracle
@@ -228,7 +237,7 @@ then
 fi
 
 #assumption we are always going to install a 'new' sqldeveloper so remoive as shipped one
-rm -rf $ORACLE_HOME/sodapatch $ORACLE_HOME/sqldeveloper  $ORACLE_HOME/apexpatch $ORACLE_HOME/assistants /u01/app/OraInventory /u01/app/oracle/product/12.2/db_1/p6880880_121010_Linux-x86-64.zip /u01/stagevb
+rm -rf $ORACLE_HOME/sodapatch $ORACLE_HOME/sqldeveloper  $ORACLE_HOME/apexpatch $ORACLE_HOME/assistants /u01/app/OraInventory /u01/app/oracle/product/version/db_1/p6880880_121010_Linux-x86-64.zip /u01/stagevb
 echo "bash /tmp/1/buildTimeCheckVersion.sh after_remove
 " > /tmp/asoracle
 
@@ -312,7 +321,14 @@ rm -rf $ORACLE_HOME/javavm/jdk/jdk7
 rm -rf ~oracle/apex/builder
 rm -rf $ORACLE_HOME/.patch_storage
 rm -rf $ORACLE_HOME/oc4j
-rm -rf $ORACLE_HOME/bin/sql
+if test -f /home/oracle/sqlcl/bin/sql
+then
+    rm -rf $ORACLE_HOME/bin/sql
+fi
+if test -f /home/oracle/sqldeveloper/sqldeveloper.sh
+then
+    rm -rf $ORACLE_HOME/bin/sqldeveloper.sh
+fi
 rm -rf ~oracle/VBoxGuestAdditions.iso
 rm ~oracle/*.debuglog ~oracle/reset_xmldbjson.log
 rpm -e gnome-user-docs gnome-getting-started-docs
@@ -320,10 +336,12 @@ rpm -e gnome-user-docs gnome-getting-started-docs
 yum -y clean all
 du -sh /var/tmp/yum-oracle-kPjjzB
 rm -rf /var/tmp/yum-oracle-kPjjzB
-
+rm /var/spool/abrt/*/coredump
 #bye bye maintainability...
-du -sh /u01/app/oracle/product/12.2/db_1/inventory
-rm -rf /u01/app/oracle/product/12.2/db_1/inventory/*
+du -sh /u01/app/oracle/product/version/db_1/inventory
+rm -rf /u01/app/oracle/product/version/db_1/inventory/*
+#remove extra 900 meg non essential directories and zips - note static library files not removed for now.
+rm -rf  $ORACLE_HOME/suptools/* $ORACLE_HOME/OPatch/* 20M $ORACLE_HOME/lib/ra_windows64.zip $ORACLE_HOME/lib/ra_solaris_x64.zip $ORACLE_HOME/lib/ra_aix_ppc64.zip $ORACLE_HOME/lib/ra_zlinux64.zip $ORACLE_HOME/lib/ra_solaris_sparc64.zip $ORACLE_HOME/lib/ra_hpux_ia64.zip $ORACLE_HOME/md/property_graph/pgx/server/pgx-webapp-2.5.1-wls.war $ORACLE_HOME/md/property_graph/pgx/server/pgx-webapp-2.5.1.war
 if test "m$BUILD_WEB_PROXY" != "m"
 then
     printf "2d\nw\nq"|ed /etc/yum.conf
@@ -365,7 +383,42 @@ cd /home/oracle
 #export DISPLAY=$OLDDISPLAY
 #/usr/bin/vncserver -kill :70
 #rm -rf ~/.vnc
-
+echo '
+echo do this a second time the first time did not take maybe images etc not in place restclient was OK.
+export LD_LIBRARY_PATH=
+cd ~/Desktop
+echo default zoom level seemed also to be reset around here
+dbus-launch gsettings set org.gnome.nautilus.icon-view default-zoom-level small
+dbus-launch gio set "Rest Client.desktop" "metadata::trusted" yes
+dbus-launch gio set "SQL Developer.desktop" "metadata::trusted" yes
+dbus-launch gio set "Oracle-datamodeler.desktop" "metadata::trusted" yes
+dbus-launch gio set "Click here to Start.desktop" "metadata::trusted" yes
+dbus-launch gio set "sql.desktop" "metadata::trusted" yes
+' > /tmp/icons.sh
+su - oracle -c '/bin/bash /tmp/icons.sh'
+echo "#!/bin/bash
+#horrible place to put it 3rd try at setting metadata trusted now on every gnome login
+cd ~/Desktop
+export LD_LIBRARY_PATH=
+gio set 'Rest Client.desktop' 'metadata::trusted' yes
+gio set 'SQL Developer.desktop' 'metadata::trusted' yes
+gio set 'Oracle-datamodeler.desktop' 'metadata::trusted' yes
+gio set 'Click here to Start.desktop' 'metadata::trusted' yes
+gio set 'sql.desktop' 'metadata::trusted' yes
+gsettings set org.gnome.desktop.session idle-delay 0
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.background picture-uri ''
+gsettings set org.gnome.desktop.background primary-color '#000000'
+cd -
+#have to put in applications directly or screen wonkey mv ~/Desktop/*.desktop ~/.local/share/applications/
+. /home/oracle/runTimeEnforceMinScreenSize.sh
+if test -f /home/oracle/runTimeEnforceMinScreenSize.sh.alt
+then
+mv /home/oracle/runTimeEnforceMinScreenSize.sh.alt /home/oracle/runTimeEnforceMinScreenSize.sh
+chmod 755 /home/oracle/runTimeEnforceMinScreenSize.sh
+fi">/home/oracle/setsizewrap.sh
+chmod 755 /home/oracle/setsizewrap.sh
+chown oracle /home/oracle/setsizewrap.sh
 echo '#!/bin/bash
 mkdir -p ~/.config/autostart
 echo "[Desktop Entry]
@@ -377,15 +430,8 @@ Terminal=false
 Type=Application
 X-GNOME-Autostart-enabled=true"> ~/.config/autostart/800x600.desktop
 chmod 755 ~/.config/autostart/800x600.desktop
-echo "#!/bin/bash
-. /home/oracle/runTimeEnforceMinScreenSize.sh
-if test -f /home/oracle/runTimeEnforceMinScreenSize.sh.alt
-then
-mv /home/oracle/runTimeEnforceMinScreenSize.sh.alt /home/oracle/runTimeEnforceMinScreenSize.sh
-chmod 755 /home/oracle/runTimeEnforceMinScreenSize.sh
-fi">/home/oracle/setsizewrap.sh
-chmod 755 /home/oracle/setsizewrap.sh
 cd ~/Desktop
+cp readme.txt readmeCopy.txt 
 history -c
 history -w
 '> /tmp/asoracle

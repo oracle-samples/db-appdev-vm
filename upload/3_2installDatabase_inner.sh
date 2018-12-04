@@ -26,13 +26,12 @@
 
 
 . ~oracle/runTimeStartScript.sh
-mkdir /u01/stagevb
-mv /tmp/1/linuxx64_122_database.zip /u01/stagevb
-cd /u01/stagevb
-unzip linuxx64_122_database.zip
+mkdir -p /u01/app/oracle/product/version/db_1
+mv /tmp/1/LINUX.X64_180000_db_home.zip /u01/app/oracle/product/version/db_1
+cd /u01/app/oracle/product/version/db_1
+unzip LINUX.X64_180000_db_home.zip
+rm LINUX.X64_180000_db_home.zip
 echo assumption this results in a directory database
-rm linuxx64_122_database.zip
-cd /u01/stagevb/database
 
 ./runInstaller -silent -ignorePrereq -waitForCompletion -responseFile /tmp/1/buildTimeSoftwareInstall.rsp
 
@@ -46,10 +45,10 @@ if test "m$DBENV" = "m" -a "m$GNOME_CHECK" = "m0"
 then
 export TMP=/tmp
 export TMPDIR=$TMP
-export ORACLE_UNQNAME=orcl12c
+export ORACLE_UNQNAME=orclcdb
 export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=$ORACLE_BASE/product/12.2/db_1
-export ORACLE_SID=orcl12c
+export ORACLE_HOME=$ORACLE_BASE/product/version/db_1
+export ORACLE_SID=orclcdb
 #LD_LIBRARY_PATH
 export PATH=/home/oracle/bin:/home/oracle/LDLIB:$ORACLE_HOME/bin:/usr/sbin:$PATH
 #during install set LD_LIBRARY_PATH otherwise rely on LDLIB wrappers and ~/bin/sql sqlplus and modeller

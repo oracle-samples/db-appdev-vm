@@ -170,7 +170,7 @@ for f in rest_sqldev reset_xmldb reset_soup reset_apex reset_json reset_rest res
 do
     if test -f "$f"
     then
-    sed -i '1sZ^Zexport LD_LIBRARY_PATH=/u01/app/oracle/product/12.2/db_1/lib\
+    sed -i '1sZ^Zexport LD_LIBRARY_PATH=/u01/app/oracle/product/version/db_1/lib\
 Zg' $f
 	printf "\necho 'alter user hr identified by oracle account unlock;'|sqlplus system/oracle@localhost:1521/orcl\necho 'create or replace trigger EMPLOYEES_EMPLOYEE_ID_TRG
 before insert on employees
@@ -191,7 +191,6 @@ done
 #    for f in reset_sqldev reset_soup reset_apex; do bash -x ./$f >$f.debuglog 2>&1 ; done
 #fi
 
-ed -s ~/Desktop/'Click here to Start.desktop' <<< $',s/Click here to Start/Click here to Start Labs/g\nw'
 echo MARK_END 1690 end use git then reset all demos _including apex_.
 else 
 ~oracle/buildTimeReportSkippingFile.sh "demos.zip - internal test run,"

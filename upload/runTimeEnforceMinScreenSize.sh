@@ -58,7 +58,8 @@ doseveral() {
 	 fi
 	done
 }
-echo 'echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "469,10" >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
+echo 'echo skipped  >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
+#echo 'echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "469,10" >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
 echo xrandr > ~/repeat.setsize
 doseveral x 500 7
@@ -67,7 +68,8 @@ export result=`echo "$result" | grep -e " connected [^(]" | sed -e "sX\([A-Z0-9a
 echo GREPRESULT="$result" >>  ~oracle/setsize.log
 echo 'xrandr --output '"$result"' --mode 800x600 >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
-echo 'echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "469,10" >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
+echo 'echo skipped >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
+#echo 'echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "469,10" >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
 
 if test -f ~/runTimeEnforceMinScreenSize.sh.redoicon
@@ -84,8 +86,15 @@ echo '#!/bin/bash
 if test -f ~/Desktop/readme.txt
 then
 	cat ~/Desktop/readme.txt
+if test -f ~/ords/ords.war
+then
+if test -f ~/sqlcl/lib/jdbcrest.jar
+then
+echo 'try JDBC REST driver: sql HRREST/oracle@http://localhost:8080/ords/hrrest/' 
+fi
+fi
 else
-	echo No default readme.txt - minium install is Oracle linux 7.3 and Oracle Database 12.2
+	echo No default readme.txt - minium install is Oracle linux 7.3 and Oracle Database 18.3
 fi
 
 cd ~

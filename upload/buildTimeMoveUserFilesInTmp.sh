@@ -30,12 +30,12 @@ export BUILD_HAVEPATCH=TRUE" > /tmp/1/BUILD_CONFIG.sh
 export USHOME=/tmp/put_files_here
 export BUILDHOME=$USHOME
 export EURHOME=$USHOME
-export DATABASE1URL=$USHOME/linux*122*_database.zip
+export DATABASE1URL=$USHOME/LINUX.X64_*_db_home.zip
 export DEMOSURL=$BUILDHOME/demos.zip
 export JAVAURL=$EURHOME/jdk-8u*-linux-x64.tar.gz
 export SQLDEVURL=$BUILDHOME/sqldeveloper-*-no-jre.zip
-export SQLCLURL=$EURHOME/sqlcl-*-no-jre.zip
-export APEXURL=$EURHOME/apex_5*.zip
+export SQLCLURL=$EURHOME/sqlcl*.zip
+export APEXURL=$EURHOME/apex_*.zip
 export ORDSURL=$EURHOME/ords*.zip
 export MODELLER=$EURHOME/datamodeler-*-no-jre.zip
 export MOZILLABLOB=$EURHOME/mozillablob.zip
@@ -43,12 +43,14 @@ export RESTCLIENTUI=$EURHOME/restclient*.jar
 export STORM=$USHOME/storm.zip
 export RESETXMLDBJSON=$USHOME/reset_xmldbjson
 export SAMPLESCHEMAS=$USHOME/master.zip
+export JDBCREST=$USHOME/oracle.dbtools.jdbcrest*.jar
+export WALLET=$USHOME/cwallet.sso
 function download() {
 #echo OUTPUT $2 SOURCE $1
     mv  $1 "$2"
     if test "m$?" != "m0"
     then
-	if test "m$1" = "mlinux*122*_database.zip"
+	if test "m$1" = "mLINUX.X64_*_db_home.zip"
 	then
 	    echo PROGRESS: XXXXXXXXXXXXXX mv for essential "$2" failed XXXXXXXXXXXX
 	else 
@@ -58,8 +60,8 @@ function download() {
     fi
 }
 export -f download
-
-printf "$DATABASE1URL\n/tmp/1/linuxx64_122_database.zip\n$JAVAURL\n/tmp/1/jdk8x64.tar.gz\n$SQLDEVURL\n/tmp/1/sqldev.zip\n$SQLCLURL\n/tmp/1/sqlcl.zip\n$APEXURL\n/tmp/1/apex.zip\n$ORDSURL\n/tmp/1/ords.zip\n$DEMOSURL\n/tmp/1/demos.zip\n$MOZILLABLOB\n/tmp/1/mozillablob.zip\n$MODELLER\n/tmp/1/modeler.zip\n$RESTCLIENTUI\n/tmp/1/restclient.jar\n$STORM\n/tmp/1/storm.zip\n$RESETXMLDBJSON\n/tmp/1/reset_xmldbjson\n$SAMPLESCHEMAS\n/tmp/1/master.zip" | xargs -n2 -P3 bash -c 'download "$0" "$1"'
+#linuxx64_122_database.zip
+printf "$DATABASE1URL\n/tmp/1/LINUX.X64_180000_db_home.zip\n$JAVAURL\n/tmp/1/jdk8x64.tar.gz\n$SQLDEVURL\n/tmp/1/sqldev.zip\n$SQLCLURL\n/tmp/1/sqlcl.zip\n$APEXURL\n/tmp/1/apex.zip\n$ORDSURL\n/tmp/1/ords.zip\n$DEMOSURL\n/tmp/1/demos.zip\n$MOZILLABLOB\n/tmp/1/mozillablob.zip\n$MODELLER\n/tmp/1/modeler.zip\n$RESTCLIENTUI\n/tmp/1/restclient.jar\n$STORM\n/tmp/1/storm.zip\n$RESETXMLDBJSON\n/tmp/1/reset_xmldbjson\n$SAMPLESCHEMAS\n/tmp/1/master.zip\n$WALLET\n/tmp/1/cwallet.sso" | xargs -n2 -P3 bash -c 'download "$0" "$1"'
 if test "m$?" != "m0"
 then
   echo PROGRESS: XXXXXXXXXXXXXX parallel mv failed XXXXXXXXXXXXXX

@@ -43,6 +43,9 @@ Terminal=false
 Icon[en_US]=gnome-panel-launcher
 Name[en_US]=Rest Client
 Exec=/home/oracle/bin/buildTimeSetupRestClient.sh
-Name=Rest Client'> ~/Desktop/'Rest Client.desktop'
-chmod 755  ~/Desktop/'Rest Client.desktop'
+Name=Rest Client'> /home/oracle/Desktop/'Rest Client.desktop'
+chmod 755  /home/oracle/Desktop/'Rest Client.desktop'
+export LD_LIBRARY_PATH=
+cd ~/Desktop
+dbus-launch gio set "Rest Client.desktop" "metadata::trusted" yes
 fi

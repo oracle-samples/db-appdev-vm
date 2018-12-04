@@ -58,6 +58,7 @@ doseveral() {
 	 fi
 	done
 }
+#echo 'echo iconsizesetup skupped as no longer on desktop>> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 echo '(gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::icon-scale "5.58333333333"&&gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "20,222" )>> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 #echo '(echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-scale "5.58333333333"&&gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::icon-scale "5.58333333333"&&echo gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "20,222" )>> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
@@ -69,6 +70,7 @@ export result=`echo "$result" | grep -e " connected [^(]" | sed -e "sX\([A-Z0-9a
 echo GREPRESULT="$result" >>  ~oracle/setsize.log
 echo 'xrandr --output '"$result"' --mode 800x600 >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
+#echo 'echo size set skipped not on desktop >> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 echo '(gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::icon-scale "5.58333333333"&&gvfs-set-attribute ~/Desktop/"Click here to Start.desktop" metadata::nautilus-icon-position "20,222" )>> ~oracle/setsize.log 2>&1' > ~/repeat.setsize
 doseveral x 50 7
 

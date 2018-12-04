@@ -28,16 +28,22 @@
 #cd /u01
 #rm -rf /u01/stagevb
 #bash -lc 'netca -silent -responseFile /tmp/1/netca.rsp'
-export ORACLE_HOME=/u01/app/oracle/product/12.2/db_1
+export ORACLE_HOME=/u01/app/oracle/product/version/db_1
+bash -lc 'dbca -silent -createDatabase -responseFile /tmp/1/buildTimeDBCA.rsp; if test "m$?" != "m0" 
+then
+echo error on dbca
+tail -100 /u01/app/oracle/cfgtoollogs/dbca/orclcdb/orclcdb.log
+fi'
+bash -lc 'lsnrctl stop'
 #nice to have set up hostname and default database ala XE
 mkdir -p $ORACLE_HOME/network/admin
 echo 'NAME.DIRECTORY_PATH= {TNSNAMES, EZCONNECT, HOSTNAME}'> $ORACLE_HOME/network/admin/sqlnet.ora
 echo 'SID_LIST_LISTENER =
   (SID_LIST =
     (SID_DESC =
-      (GLOBAL_DBNAME = orcl12c)
-      (SID_NAME = orcl12c)
-      (ORACLE_HOME = /u01/app/oracle/product/12.2/db_1)
+      (GLOBAL_DBNAME = orclcdb)
+      (SID_NAME = orclcdb)
+      (ORACLE_HOME = /u01/app/oracle/product/version/db_1)
     )
   )
 
@@ -50,12 +56,12 @@ LISTENER =
   )
 
 #HOSTNAME by pluggable not working rstriction or configuration error.
-DEFAULT_SERVICE_LISTENER = (orcl12c)
+DEFAULT_SERVICE_LISTENER = (orclcdb)
 '> $ORACLE_HOME/network/admin/listener.ora
 
 
 
-echo 'ORCL12C=localhost:1521/orcl12c'>> /u01/app/oracle/product/12.2/db_1/network/admin/tnsnames.ora
+echo 'ORCLCDB=localhost:1521/orclcdb'>> /u01/app/oracle/product/version/db_1/network/admin/tnsnames.ora
 echo 'ORCL=
  (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
@@ -63,11 +69,10 @@ echo 'ORCL=
       (SERVER = DEDICATED)
       (SERVICE_NAME = orcl)
     )
-  )'>> /u01/app/oracle/product/12.2/db_1/network/admin/tnsnames.ora
+  )'>> /u01/app/oracle/product/version/db_1/network/admin/tnsnames.ora
+
 
 bash -lc 'lsnrctl start'
-bash -lc 'dbca -silent -createDatabase -responseFile /tmp/1/buildTimeDBCA.rsp; if test "m$?" != "m0" 
-then
-echo error on dbca
-tail -100 /u01/app/oracle/cfgtoollogs/dbca/orcl12c/orcl12c.log
-fi'
+echo 'export TWO_TASK=;echo alter system register ";" |sqlplus sys/oracle as sysdba' > /tmp/12
+chmod 755 /tmp/12
+bash -lc '/tmp/12'

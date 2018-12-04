@@ -27,6 +27,12 @@
 
 . ~oracle/runTimeStartScript.sh
 
+if test -f /tmp/1/cwallet.sso
+then
+    mkdir /home/oracle/wallet
+    cp /tmp/1/cwallet.sso /home/oracle/wallet
+    chmod -R 755 /home/oracle/wallet
+fi
 cd $ORACLE_HOME/apex
 echo apex not preinstalled anymore
 ls -l apxremov_con.sql
@@ -78,16 +84,24 @@ EXEC DBMS_UTILITY.compile_schema(schema => 'FLOWS_FILES');
 EXEC DBMS_UTILITY.compile_schema(schema => 'APEX_050100');
 EXEC DBMS_UTILITY.compile_schema(schema => 'APEX_PUBLIC_USER');
 EXEC DBMS_UTILITY.compile_schema(schema => 'FLOWS_FILES');
-
+column totupapex new_val totupapex
+--APEX_180100 check
+select username totupapex from all_users where username like 'APEX_0%' or username like 'APEX_1%' or username like 'APEX_2%' order by totupapex asc;
+clear column
+EXEC DBMS_UTILITY.compile_schema(schema => '&totupapex');
+EXEC DBMS_UTILITY.compile_schema(schema => 'APEX_PUBLIC_USER');
+EXEC DBMS_UTILITY.compile_schema(schema => 'FLOWS_FILES');
 --anonymous needs to be unlocked should be unlocked at pdb level might error?? SELECT username, account_status FROM dba_users; 
 alter user anonymous identified by oracle;
 alter user anonymous account unlock;
 ALTER USER APEX_050000 identified by oracle;
 ALTER USER APEX_050100 identified by oracle;
+ALTER USER &totupapex identified by oracle;
 ALTER USER APEX_PUBLIC_USER identified by oracle;
 ALTER USER FLOWS_FILES identified by oracle;
 ALTER USER APEX_050000 ACCOUNT UNLOCK;
 ALTER USER APEX_050100 ACCOUNT UNLOCK;
+ALTER USER &totupapex ACCOUNT UNLOCK;
 ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK;
 ALTER USER FLOWS_FILES ACCOUNT UNLOCK;
 "|$SQL_OR_SQLPLUS sys/oracle@localhost:1521/orcl as sysdba
@@ -191,6 +205,56 @@ end;
 /
 commit;
 " |  sqlplus sys/oracle@localhost:1521/orcl as sysdba
+echo "whenever sqlerror exit 1
+column totupapex new_val totupapex
+--APEX_180100 check
+select username totupapex from all_users where username like 'APEX_0%' or username like 'APEX_1%' or username like 'APEX_2%' order by totupapex asc;
+clear column
+alter session set current_schema = &totupapex;
+
+PROMPT <<--------------- Setting Instance Settings --------------->>
+begin
+  wwv_flow_security.g_security_group_id := 10;
+  wwv_flow_security.g_user := 'ADMIN';
+  wwv_flow.g_import_in_progress := true;
+
+  for c1 in (select user_id
+             from wwv_flow_fnd_user
+             where security_group_id = wwv_flow_security.g_security_group_id
+             and   user_name = wwv_flow_security.g_user
+            ) loop
+    APEX_UTIL.edit_user
+      (  p_user_id       => c1.user_id
+       , p_user_name     => wwv_flow_security.g_user
+       , p_web_password  => 'oracle'
+       , p_new_password  => 'oracle'
+       ,p_change_password_on_first_use => 'N',
+       p_first_password_use_occurred => 'Y'      );
+    end loop;
+   wwv_flow.g_import_in_progress := false;
+   APEX_INSTANCE_ADMIN.SET_PARAMETER('PASSWORD_HISTORY_DAYS',0);
+   APEX_INSTANCE_ADMIN.SET_PARAMETER('STRONG_SITE_ADMIN_PASSWORD','N');
+   APEX_INSTANCE_ADMIN.SET_PARAMETER('ACCOUNT_LIFETIME_DAYS',36500);
+
+end;
+/
+commit;
+" |  sqlplus sys/oracle@localhost:1521/orcl as sysdba
+echo "
+column totupapex new_val totupapex
+--APEX_180100 check
+select username totupapex from all_users where username like 'APEX_0%' or username like 'APEX_1%' or username like 'APEX_2%' order by totupapex asc;
+clear column
+BEGIN
+    DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
+        host => '*',
+        ace => xs"'$'"ace_type(privilege_list => xs"'$'"name_list('connect'),
+                           principal_name => '&totupapex',
+                           principal_type => xs_acl.ptype_db));
+END;
+/
+commit;
+"|  sqlplus sys/oracle@localhost:1521/orcl as sysdba 
 
 else
 	~oracle/buildTimeReportSkippingFile.sh apex.zip
