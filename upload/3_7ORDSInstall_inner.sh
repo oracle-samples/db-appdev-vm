@@ -26,9 +26,15 @@
 
 
 . ~oracle/runTimeStartScript.sh
+if test -f /tmp/1/oracle.dbtools.jdbcrest.jar
+then
+cp /tmp/1/oracle.dbtools.jdbcrest.jar ~/sqlcl/lib
+chmod 644 ~/sqlcl/lib/oracle.dbtools.jdbcrest.jar
+chown oracle  ~/sqlcl/lib/oracle.dbtools.jdbcrest.jar
+fi
 if test -f /tmp/1/ords.zip
 then
-	if test -f /home/oracle/sqldeveloper/ords
+	if test -d /home/oracle/sqldeveloper/ords
 	then
 		if test -f /tmp/1/apex.zip
 		then
@@ -81,8 +87,7 @@ then
 	set timeout 600
 	spawn java -jar /home/oracle/ords/ords.war install --parameterFile /home/oracle/ords/ords_params_vmconfig.properties simple
 
-	expect -regexp "Enter the username with SYSDBA privileges to verify the installation .SYS.." { send "sys\r" }
-	expect -regexp "Enter the database password for sys." {send "oracle\r"}
+	expect -regexp "Enter the database password for SYS AS SYSDBA." {send "oracle\r"}
 	expect -regexp "Confirm password." {send "oracle\r"}
 	expect -regexp " if using HTTPS .1.." {send "1\r"}
 	expect -regexp "something the WiLl Never Happen" {send "jingle bella\r"}
@@ -94,8 +99,34 @@ then
 	echo tags to search stdout 1690 160
 	cat /tmp/zzz
 	echo /home/oracle/bin/ords.sh stop
-	/home/oracle/bin/ords.sh stop
+	mv /home/oracle/ords/vmconfig/ords/defaults.xml /home/oracle/ords/vmconfig/ords/defaults.xml.SAV
+	cat /home/oracle/ords/vmconfig/ords/defaults.xml.SAV|sed 'sZ<entry key="db.port">1521</entry>Z<entry key="db.port">1521</entry>\n<entry key="restEnabledSql.active">true</entry>\n<entry key="security.verifySSL">false</entry>Zg'>/home/oracle/ords/vmconfig/ords/defaults.xml
+        chmod 755 /home/oracle/ords/vmconfig/ords/defaults.xml
+        /home/oracle/bin/ords.sh stop
 	rm ~/bin/x.sh /tmp/zzz
+	cp /tmp/1/runtime9090ORDS.properties ~oracle
+	cp /tmp/1/uninstall9090ORDS.properties ~oracle
+	if test -f /tmp/1/demos.zip
+	then
+		cp /tmp/1/9090init /tmp/1/9090start /tmp/1/9090stop ~/bin
+		chmod 755 ~/bin/9090init ~/bin/9090start ~/bin/9090stop
+	fi
+	/home/oracle/bin/ords.sh start
+	cd ~/ords
+
+	echo '#!/usr/bin/expect
+exp_internal 1
+set timeout 1200
+spawn $JAVA_HOME/bin/java -jar ords.war user HRREST "SQL Developer"
+expect -regexp "Enter a password for user HRREST." { send "oracle\r" }
+expect -regexp "Confirm password for user HRREST." {send "oracle\r"}
+expect -regexp "Something that will never happen to force keep searching until process end" {send "neverhappen\r"}
+interact'| sed 'sZ$JAVA_HOMEZ'"$JAVA_HOME"'Zg' > ~/bin/xp.sh
+chmod 755 ~/bin/xp.sh
+~/bin/xp.sh
+rm ~/bin/xp.sh
+cd -
+	/home/oracle/bin/ords.sh stop
 else
 	~oracle/buildTimeReportSkippingFile.sh ords.zip 
 fi

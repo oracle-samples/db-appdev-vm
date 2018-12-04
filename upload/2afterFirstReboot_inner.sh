@@ -44,9 +44,9 @@ if test "m$BUILD_WEB_PROXY" != "m"
 then
     printf "2d\nw\nq"|ed /etc/yum.conf
 fi
-#fix for intermittant java/sqldeveloper cursor copy issue
-cat /etc/default/grub| sed 's/^\(GRUB_CMDLINE_LINUX="[^"]*\)/\1 nomodeset/g' > /tmp/xx
-cp /tmp/xx /etc/default/grub
-grub2-mkconfig -o /boot/grub2/grub.cfg
+#fix for intermittant java/sqldeveloper cursor copy issue supposedly fixed in latest (openjdk?) java152
+#cat /etc/default/grub| sed 's/^\(GRUB_CMDLINE_LINUX="[^"]*\)/\1 nomodeset/g' > /tmp/xx
+#cp /tmp/xx /etc/default/grub
+#grub2-mkconfig -o /boot/grub2/grub.cfg
 . ~oracle/buildTimeEnd.sh
 exit 0

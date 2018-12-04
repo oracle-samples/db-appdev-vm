@@ -50,7 +50,7 @@ set timeout 1200
 spawn $ORACLE_HOME/perl/bin/perl $ORACLE_HOME/rdbms/admin/catcon.pl -u SYS -d $ORACLE_HOME/rdbms/admin -l "/home/oracle/utl32k_cdb_pdbs_output" -b  utl32k_cdb_pdbs_output utl32k.sql
 expect -regexp "Enter Password.." { send "oracle\r" }
 expect -regexp "something the WiLl Never Happen" {send "jingle bella\r"}
-interact'| sed 'sZ$ORACLE_HOMEZ'"/u01/app/oracle/product/12.2/db_1"'Zg' > ~/bin/xp.sh
+interact'| sed 'sZ$ORACLE_HOMEZ'"/u01/app/oracle/product/version/db_1"'Zg' > ~/bin/xp.sh
 
 chmod 755 ~/bin/xp.sh
 ~/bin/xp.sh
@@ -76,7 +76,7 @@ set timeout 2000
 spawn $ORACLE_HOME/perl/bin/perl $ORACLE_HOME/rdbms/admin/catcon.pl -u SYS -d $ORACLE_HOME/rdbms/admin -l "/home/oracle/utlrp_cdb_pdbs_output" -b utlrp_cdb_pdbs_output utlrp.sql
 expect -regexp "Enter Password.." { send "oracle\r" }
 expect -regexp "something the WiLl Never Happen" {send "jingle bella\r"}
-interact' | sed 'sZ$ORACLE_HOMEZ'"/u01/app/oracle/product/12.2/db_1"'Zg' > ~/bin/xp.sh
+interact' | sed 'sZ$ORACLE_HOMEZ'"/u01/app/oracle/product/version/db_1"'Zg' > ~/bin/xp.sh
 
 chmod 755 ~/bin/xp.sh
 ~/bin/xp.sh

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. 
 # 
@@ -13,30 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. 
 # 
-#################################################################################
-#
-# File: runTimeParametersForORDS.properties
-#
-# Description: parameters for ORDS
-#
-#################################################################################
-db.hostname=localhost
-db.password=oracle
-db.port=1521
-db.servicename=orcl
-db.username=APEX_PUBLIC_USER
-plsql.gateway.add=true
-rest.services.apex.add=true
-rest.services.ords.add=false
-schema.tablespace.default=SYSAUX
-schema.tablespace.temp=TEMP
-standalone.http.port=8080
-standalone.mode=true
-standalone.static.images=/u01/userhome/oracle/apex/images
-user.apex.listener.password=oracle
-user.apex.restpublic.password=oracle
-user.public.password=oracle
-user.tablespace.default=USERS
-user.tablespace.temp=TEMP
 
+#################################################################################
+#
+# File: 9090init
+#
+# Description: Install Oracle REST Data Services on port 9090
+#
+#################################################################################
+
+JETCONFIGDIR="/home/oracle/sqldeveloper/ords/hol-config"
+if test -d $JETCONFIGDIR
+then
+   sh /home/oracle/Desktop/Database_Track/ORDS/reset_ords.sh reinstall
+else
+   sh /home/oracle/Desktop/Database_Track/ORDS/reset_ords.sh install
+fi
 

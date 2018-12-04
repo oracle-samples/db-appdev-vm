@@ -26,6 +26,7 @@
 
 
 . ~oracle/runTimeStartScript.sh
+dbus-launch gsettings set org.gnome.nautilus.icon-view default-zoom-level small
 mkdir -p /home/oracle/java
 mkdir -p /home/oracle/Desktop/images
 if test -f /tmp/1/jdk8x64.tar.gz
@@ -126,7 +127,7 @@ fi
 #actually made further up this script
 if test /tmp/1/sqldev.zip
 then
-cp /tmp/1/"SQL Developer.desktop" /home/oracle/Desktop
+cp /tmp/1/"SQL Developer.desktop" /home/oracle/Desktop/
 fi
 #cp /tmp/1/readme.txt /home/oracle/Desktop
 #probably want to skip next 5 commands in testing - and have them prebuilt into the base. what if they ask for a reboot? - force a reboot at end?
@@ -154,7 +155,7 @@ Exec=/home/oracle/bin/datamodeler
 Terminal=false
 Type=Application
 X-Desktop-File-Install-Version=0.21
-Categories=X-Red-Hat-Extra;Application;Development;" > /home/oracle/Desktop/Oracle-datamodeler.desktop
+" > /home/oracle/Desktop/Oracle-datamodeler.desktop
 chmod 755 /home/oracle/Desktop/Oracle-datamodeler.desktop
 echo '#!/bin/bash
 #should do image or desktop
@@ -173,16 +174,16 @@ echo '#!/bin/bash
 #LD_LIBRARY_PATH
 #normal .bashrc does not set LD_LIBRARY_PATH even the first time
 export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=$ORACLE_BASE/product/12.2/db_1
+export ORACLE_HOME=$ORACLE_BASE/product/version/db_1
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 if test "m$DBENV" = "m"
 then
 export TMP=/tmp
 export TMPDIR=$TMP
-export ORACLE_UNQNAME=orcl12c
+export ORACLE_UNQNAME=orclcdb
 export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=$ORACLE_BASE/product/12.2/db_1
-export ORACLE_SID=orcl12c
+export ORACLE_HOME=$ORACLE_BASE/product/version/db_1
+export ORACLE_SID=orclcdb
 export PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
@@ -200,12 +201,24 @@ export TMZ="GMT"
 export JAVA_HOME=`ls -d /home/oracle/java/jdk* 2>/dev/null`
 if test "m$JAVA_HOME" = "m"
 then
-export JAVA_HOME=/u01/app/oracle/product/12.2/db_1/jdk
+export JAVA_HOME=/u01/app/oracle/product/version/db_1/jdk
 fi
 export PATH=$JAVA_HOME/bin:/home/oracle/bin:/home/oracle/sqlcl/bin:/home/oracle/sqldeveloper:/home/oracle/datamodeler:$PATH:/home/oracle/sqlcl/bin:/home/oracle/sqldeveloper:/home/oracle/bin
 export JAVAENV=true
 fi'>>/home/oracle/.bashrc
-
+ed -s /home/oracle/Desktop/'Click here to Start.desktop' <<< $',s/Click here to Start/Click here to Start Labs/g\nw'
+echo '
+bash /tmp/1/buildTimeSetupRestClient.sh
+export LD_LIBRARY_PATH=
+cd ~/Desktop
+echo only rest client worked do this again at the end icon size seems almost similar whether trusted or not
+dbus-launch gio set "Rest Client.desktop" "metadata::trusted" yes
+dbus-launch gio set "SQL Developer.desktop" "metadata::trusted" yes
+dbus-launch gio set "Oracle-datamodeler.desktop" "metadata::trusted" yes
+dbus-launch gio set "Click here to Start.desktop" "metadata::trusted" yes
+dbus-launch gio set "sql.desktop" "metadata::trusted" yes
+' > /tmp/icons.sh
+bash /tmp/icons.sh
 cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
 cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
 cp /tmp/1/runTimeLabStylesheet.css /home/oracle/Desktop/style.css

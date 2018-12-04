@@ -2,7 +2,7 @@ Oracle Developer Day VM Builder
 ===============================
 
 Welcome to the packer build for the Oracle Developer Day vm.  
-This will build a Oracle Linux server and install a 12.2 Oracle database on the machine.  Follow the download instructions to download the software to install and follow the build instructions to build the machine.  You will need around 30gb of space free to store the downloads and run the build.
+This will build a Oracle Linux server and install a 18.3 Oracle database on the machine.  Follow the download instructions to download the software to install and follow the build instructions to build the machine.  You will need around 30gb of space free to store the downloads and run the build.
 
 There are several directories which are used in the build
 
@@ -15,9 +15,7 @@ Mandatory Downloads
 **These two downloads are mandatory**.  If they are not here, the build will not start.
 
 * OracleLinux-R7-U3-Server-x86_64-dvd.iso (needs to be this exactly md5 checked)
-* see : http://edelivery.oracle.com/linux (I cannot give more direct link - as (free) login required + need to be over 18)
-* linux\*122*_database.zip (12201 has been verified - silent install may be incompatible with later versions)
-* see :  http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html# - (free) login required to accept license
+* LINUX.X64_180000_db_home.zip (183 has been verified - silent install may be incompatible with later versions)
 
 Optional Downloads
 --------------
@@ -26,8 +24,8 @@ If these files are available in the **put_files_here** directory, the build will
 * jdk-8u\*-linux-x64.tar.gz - **Oracle JDK**
 * sqldeveloper-\*-no-jre.zip - **Oracle SQL Developer**
 * datamodeler-\*-no-jre.zip **Oracle SQLDeveloper Data Modeler**
-* sqlcl-\*-no-jre.zip - **Oracle SQLcl**
-* apex_5\*.zip - **Oracle Application Express**
+* sqlcl-\*.zip - **Oracle SQLcl**
+* apex\_\*.zip - **Oracle Application Express** 
 * ords\*.zip - **Oracle REST Data Services** 
  
 Oracle Internal Files
@@ -51,12 +49,6 @@ update servers. optional export to export the ova.
 
 ![packer build](images/packerbuild.png)
 
-Output Directory
-----------------
-
-After building you can find the built OVA in the output directory.
-If you want the Oracle prebuilt OVA you can find it on Oracle Technology Network (OTN) [here](http://www.oracle.com/technetwork/database/enterprise-edition/databaseappdev-vm-161299.html)
-
 Build Structure
 --------------------
 
@@ -77,3 +69,29 @@ Timings:
 
 Minimum (Oracle Linux + Oracle Database)  
 Total time 60 mins (accounted for time + 7 mins rounding error / ignore <2 minute).  
+
+boot,8  
+yum update,14  
+reboot ,3  
+run database software install (not database build),3   
+dbca (database build),7  
+password and 32kvarchar2,6  
+shrink (fill disk with 0 for easy compression),3  
+1 x 3 minute reboot + shutdown + minor <1 minute stuff,10  
+
+Maximum (Including all optional extras APEX/ORDS/((internal) demos)  
+Total time 113.5 mins (Accounted for time + 10.5 mins rounding error / ignore <2 minute).  
+boot,9  
+yum update,14  
+reboot,3  
+run database software install (not database build),4  
+dbca (database build),8  
+password and 32kvarchar <should be same as minimum?>,18  
+apex install ,16  
+ords install ,4  
+set up demos and run demo reset,18  
+shrink (fill disk with 0 for easy compression),2  
+1 x 3 minute reboot + shutdown + minor <1 minute stuff - this is too long,9  
+
+Removing the shrink.sh if not exporting - fills disk with 0 for easy compression.  
+Run shrink.sh over ssh if subsequently exporting to ova (brings ova file down 60% in size to under 8Gb)

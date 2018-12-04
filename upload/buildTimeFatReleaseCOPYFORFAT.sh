@@ -17,11 +17,9 @@
 
 #################################################################################
 
-if test -f /tmp/1/loadCoffeeShopApplication.sh
-then
-su oracle -c "bash -x /tmp/1/loadCoffeeShopApplication.sh"
-fi
-if test -f /tmp/1/buildTimeFatRelease.sh
-then
-su - oracle -c "bash -x /tmp/1/buildTimeFatRelease.sh"
-fi
+. /home/oracle/.bashrc
+newpdbords
+9090init
+#on ords 9090 reset we want reinstall not uninstall
+touch ~/.ordsreinstall
+#note 9090init has a 3 minute wait to ensure ords has started

@@ -30,12 +30,12 @@
 
 #
 export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=$ORACLE_BASE/product/12.2/db_1
+export ORACLE_HOME=$ORACLE_BASE/product/version/db_1
 export ORACLE_HOME_LISTENER=$ORACLE_HOME
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 #export JAVA_HOME=$ORACLE_HOME/jdk
 export PATH=$PATH:$ORACLE_HOME/bin:$JAVA_HOME/bin
-export ORACLE_SID=orcl12c
+export ORACLE_SID=orclcdb
 #export ORACLE_TRACE=Y
 
 export PATH=$JAVA_HOME/bin:$ORACLE_HOME/bin:$PATH
@@ -58,27 +58,34 @@ case "$1" in
         if test -f /home/oracle/bin/ords.sh
         then
 	su  oracle -c "/home/oracle/bin/ords.sh start /home/oracle/ords/ords.war"
+	nohup su - oracle -c "/home/oracle/bin/9090start >> /tmp/9090startlog 2>&1" &
         fi
 	;;
   stop)
-        su  oracle -c "$ORACLE_HOME/bin/dbshut $ORACLE_HOME"
-        su  oracle -c "$ORACLE_HOME/bin/lsnrctl stop"
         if test -f /home/oracle/bin/ords.sh
         then
 	    su  oracle -c "/home/oracle/bin/ords.sh stop /home/oracle/ords/ords.war"
+	    nohup su - oracle -c "/home/oracle/bin/9090stop >> /tmp/9090stoplog 2>&1" &
 	fi
-        ;;
-  restart|reload)
         su  oracle -c "$ORACLE_HOME/bin/dbshut $ORACLE_HOME"
         su  oracle -c "$ORACLE_HOME/bin/lsnrctl stop"
+        ;;
+  restart|reload)
+        if test -f /home/oracle/bin/ords.sh
+        then
         su  oracle -c "/home/oracle/bin/ords.sh stop /home/oracle/ords/ords.war"
-        su  oracle -c "$ORACLE_HOME/bin/lsnrctl start"
+        nohup su - oracle -c "/home/oracle/bin/9090stop >> /tmp/9090stoplog 2>&1" &
+	fi
+        su  oracle -c "$ORACLE_HOME/bin/dbshut $ORACLE_HOME"
+        su  oracle -c "$ORACLE_HOME/bin/lsnrctl stop"
+	su  oracle -c "$ORACLE_HOME/bin/lsnrctl start"
         su  oracle -c "$ORACLE_HOME/bin/dbstart $ORACLE_HOME"
 	su  oracle -c "echo alter pluggable database all open';'|$ORACLE_HOME/bin/sqlplus / as sysdba"
         if test -f /home/oracle/bin/ords.sh
         then
 	su  oracle -c "/home/oracle/bin/ords.sh start /home/oracle/ords/ords.war"
-        fi
+        nohup su - oracle -c "/home/oracle/bin/9090start >> /tmp/9090startlog 2>&1" &
+	fi
 	;;
   status)
         $ORACLE_HOME/bin/lsnrctl status

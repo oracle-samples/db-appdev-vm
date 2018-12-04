@@ -28,7 +28,7 @@
 #set -x 
 # VM SPECIFIC/ testing only/ not for production use
 export TWO_TASK=
-export BASESEED=/u01/app/oracle/oradata/orcl12c
+export BASESEED=/u01/app/oracle/oradata/ORCLCDB
 export DEFAULTNEWPDBNAME=ORCL
 export CONNECT=/
 export TNSNAMESFILE=$ORACLE_HOME/network/admin/tnsnames.ora

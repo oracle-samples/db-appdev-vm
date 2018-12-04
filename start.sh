@@ -45,13 +45,19 @@ function cleanup {
 # are present otherwise, there is no point in continuing
 #
 function check_required_files {
-        export varsaccepted=
-        if test -f put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso                                            
-        then                                                                                                         
+	export varsaccepted=
+	if test -f OracleLinux-R7-U3-Server-x86_64-dvd.iso
+        then
                 export varsaccepted=" -var iso_downloaded=y "
-                cp -n put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso .                                       
-        fi
-	if test -f put_files_here/linuxx64*122*database.zip
+        else
+	    if test -f put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso
+	    then
+		export varsaccepted=" -var iso_downloaded=y "
+		mv put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso .
+		touch put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso
+	    fi
+	fi
+	if test -f put_files_here/LINUX.X64_*_db_home.zip
 	then
 		export varsaccepted=" $varsaccepted -var oracle_database_downloaded=y " 
 	fi

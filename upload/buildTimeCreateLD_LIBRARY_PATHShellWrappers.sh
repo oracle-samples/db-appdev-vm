@@ -28,7 +28,7 @@
 rm -rf ~/LDLIB/
 . ~/bin/dbenv
 cd $ORACLE_HOME/bin
-if ! test -f ~/LDLIB/
+if ! test -d ~/LDLIB/
 then
  mkdir ~/LDLIB/
  for f in *; do

@@ -102,7 +102,7 @@ EOF
 export TWO_TASK=
 sqlplus -s / as sysdba <<EOF
 	CREATE UNDO TABLESPACE undotbs2
-	         DATAFILE '/u01/app/oracle/oradata/orcl12c/undotbs2.dbf'
+	         DATAFILE '/u01/app/oracle/oradata/ORCLCDB/undotbs2.dbf'
 	         SIZE 50M AUTOEXTEND ON NEXT 50M;
 	ALTER SYSTEM SET UNDO_TABLESPACE=UNDOTBS2 SCOPE=BOTH;
 	shutdown immediate;
