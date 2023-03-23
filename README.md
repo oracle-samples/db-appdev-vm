@@ -95,3 +95,15 @@ shrink (fill disk with 0 for easy compression),2
 
 Removing the shrink.sh if not exporting - fills disk with 0 for easy compression.  
 Run shrink.sh over ssh if subsequently exporting to ova (brings ova file down 60% in size to under 8Gb)
+
+## Contributing
+
+This project is not accepting external contributions at this time. For bugs or enhancement requests, please file a GitHub issue unless it’s security related. When filing a bug remember that the better written the bug is, the more likely it is to be fixed. If you think you’ve found a security vulnerability, do not raise a GitHub issue and follow the instructions in our [security policy](./SECURITY.md).
+
+## Security
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## License
+
+Copyright (c) 2017, 2023 Oracle and/or its affiliates.
