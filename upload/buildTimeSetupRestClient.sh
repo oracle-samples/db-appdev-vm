@@ -25,7 +25,8 @@
 #################################################################################
 
 
-if test -f /tmp/1/restclient.jar
+#hackif test -f /tmp/1/restclient.jar
+if test "HACK" = "NOHACK"
 then
 cp /tmp/1/restclient.jar ~/restclient.jar
 chmod 755 ~/restclient.jar

@@ -67,7 +67,7 @@ echo 'ORCL=
     (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = orcl)
+      (SERVICE_NAME = orclcdb)
     )
   )'>> /u01/app/oracle/product/version/db_1/network/admin/tnsnames.ora
 
@@ -76,3 +76,12 @@ bash -lc 'lsnrctl start'
 echo 'export TWO_TASK=;echo alter system register ";" |sqlplus sys/oracle as sysdba' > /tmp/12
 chmod 755 /tmp/12
 bash -lc '/tmp/12'
+
+echo "show parameter parallel_max_servers
+alter system set parallel_max_servers=1 scope=both; 
+show parameter parallel_max_servers
+exit" | sqlplus sys/oracle@localhost:1521/orclcdb as sysdba
+echo "show parameter parallel_max_servers
+alter system set parallel_max_servers=1 scope=both; 
+show parameter parallel_max_servers
+exit" | sqlplus sys/oracle@localhost:1521/orclcdb as sysdba

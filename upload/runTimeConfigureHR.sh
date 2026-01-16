@@ -25,7 +25,7 @@
 #################################################################################
 
 
-export CON=localhost:1521/ORDS
+export CON=localhost:1521/FREEPDB1
 export MYSYSTEMPASSWORD=oracle
 export SQLPATH=/home/oracle/ReBuildScriptSQLDev_HR
 export NEWUSER=hr
@@ -102,20 +102,14 @@ REM  the location of the demo scrip files in in the <ORACLE_DB_HOME>\Ora<90><10>
 
 CONNECT $NEWUSER/$NEWPASSWORD@&&your_Connect_String
 
-Prompt hr_cre
-@@hr_cre
+Prompt hr_create
+@@hr_create
 
-Prompt hr_popul
-@@hr_popul
-
-Prompt hr_idx
-@@hr_idx
+Prompt hr_populate
+@@hr_populate
 
 Prompt hr_code
 @@hr_code
-
-Prompt hr_comnt
-@@hr_comnt
 
 Prompt What OBJECTS were created?
 column object_name format a30
@@ -139,4 +133,25 @@ select object_name from user_objects where status='INVALID';
 Prompt Are there any INVALID OBJECTS?
 select object_name from user_objects where status='INVALID';
 " | sqlplus system/$MYSYSTEMPASSWORD@$CON
+echo "begin
+    apex_instance_admin.add_workspace(
+        p_workspace                    => 'HR_DEV',
+        p_source_identifier            => 'HR_DEV',
+        p_primary_schema               => 'HR',
+        p_additional_schemas           => null);
+    commit;
+    apex_util.set_workspace(
+        p_workspace                    => 'HR_DEV'
+    );
+    apex_util.create_user(
+        p_user_name                    => 'HR_ADMIN',
+        p_web_password                 => 'oracle',
+        p_change_password_on_first_use => 'N',
+        p_default_schema               => 'HR',
+        p_developer_privs              => 'ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL'
+    );
+    commit;
+end;
+/
+"|sqlplus sys/oracle@$CON as sysdba
 #sqlplus $NEWUSER/$NEWPASSWORD@$CON @/home/oracle/bin/buildTimeRestEnableHR.sql

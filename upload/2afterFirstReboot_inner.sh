@@ -26,6 +26,11 @@
 
 
 . ~oracle/runTimeStartScript.sh
+if test -f /usr/bin/ol_yum_configure.sh
+then
+/usr/bin/ol_yum_configure.sh
+rm /usr/bin/ol_yum_configure.sh
+fi
 #need a reboot after yum update - new kernel 
 #set -x
 #mkdir /mnt

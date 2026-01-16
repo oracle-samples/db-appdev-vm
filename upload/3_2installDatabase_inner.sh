@@ -26,16 +26,29 @@
 
 
 . ~oracle/runTimeStartScript.sh
-mkdir -p /u01/app/oracle/product/version/db_1
-mv /tmp/1/LINUX.X64_180000_db_home.zip /u01/app/oracle/product/version/db_1
-cd /u01/app/oracle/product/version/db_1
-unzip LINUX.X64_180000_db_home.zip
-rm LINUX.X64_180000_db_home.zip
-echo assumption this results in a directory database
-
-./runInstaller -silent -ignorePrereq -waitForCompletion -responseFile /tmp/1/buildTimeSoftwareInstall.rsp
-
-echo '
+if test -f /tmp/1/LINUX.X64_180000_db_home.zip
+then
+    touch ~oracle/.isEE
+    echo 'PROGRESS:' Enterprise Edition install
+    mkdir -p /u01/app/oracle/product/version/db_1
+    mv /tmp/1/LINUX.X64_180000_db_home.zip /u01/app/oracle/product/version/db_1
+    cd /u01/app/oracle/product/version/db_1
+    unzip LINUX.X64_180000_db_home.zip
+    rm LINUX.X64_180000_db_home.zip
+    echo assumption this results in a directory database
+    
+    ./runInstaller -silent -ignorePrereq -waitForCompletion -responseFile /tmp/1/buildTimeSoftwareInstall.rsp
+    
+else
+    if test -f /tmp/1/oracle-database-preinstall.rpm -a -f /tmp/1/oracle-database-xe.rpm
+    then
+	echo 'PROGRESS:' XE install
+	touch ~oracle/.isXE
+    else
+	echo 'PROGRESS:' No database EE or XE files found
+    fi
+fi
+    echo '
 #LD_LIBRARY_PATH
 #set up db for su login and gnome terminal use so LD_LIBRARY_PATH pure for gnome and user does not have to . oraenv
 #do I still get ui issues "m1" = "m0" ie is it really an issue of these 10 lines ( and install). -a "m1" = "m0"
@@ -62,10 +75,12 @@ export DBENV=true
 export SQL_OR_SQLPLUS=sqlplus
 fi'>>/home/oracle/.bashrc
 
-cp /tmp/1/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh ~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
-
-chmod 755  ~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
-
-~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
-
+if test -f ~oracle/.isEE
+then
+    cp /tmp/1/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh ~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
+    
+    chmod 755  ~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
+    
+    ~oracle/bin/buildTimeCreateLD_LIBRARY_PATHShellWrappers.sh
+fi
 . ~oracle/buildTimeEnd.sh

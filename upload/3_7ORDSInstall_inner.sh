@@ -32,9 +32,73 @@ cp /tmp/1/oracle.dbtools.jdbcrest.jar ~/sqlcl/lib
 chmod 644 ~/sqlcl/lib/oracle.dbtools.jdbcrest.jar
 chown oracle  ~/sqlcl/lib/oracle.dbtools.jdbcrest.jar
 fi
+echo PROGRESS: You need java 11 apex and ords together for apex and ords
+
 if test -f /tmp/1/ords.zip
 then
-	if test -d /home/oracle/sqldeveloper/ords
+    if test -f /tmp/1/apex.zip
+    then
+	bash -x /tmp/1/devday_apexords.sh
+	cd /home/oracle/ords_config
+	(echo oracle; echo oracle)| ~/ords/bin/ords config user add HRREST "SQL Developer"
+	(echo oracle; echo oracle)| ~/ords/bin/ords config user add HR "SQL Developer"
+	~/ords/bin/ords config set mongo.enabled true
+	~/ords/bin/ords config set standalone.http.port 8080
+	echo might not stick it looks like hr gets dropped and recreated elsewhere so do this again at the end
+	echo "CREATE USER HR identified by oracle;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant connect to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SESSION to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE VIEW to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE JOB to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant ALTER SESSION to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE SEQUENCE TO hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SYNONYM to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE DATABASE LINK to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant RESOURCE to hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant UNLIMITED TABLESPACE TO hr;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "CREATE USER SH identified by oracle;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant connect to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SESSION to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE VIEW to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant ALTER SESSION to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE SEQUENCE TO sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SYNONYM to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE DATABASE LINK to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant RESOURCE to sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant UNLIMITED TABLESPACE TO sh;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "CREATE USER CO identified by oracle;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant connect to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SESSION to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE VIEW to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant ALTER SESSION to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE SEQUENCE TO co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "GRANT CREATE SYNONYM to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant CREATE DATABASE LINK to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant RESOURCE to co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "grant UNLIMITED TABLESPACE TO co;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	sql hr/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_HR/hr_create.sql
+	sql hr/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_HR/hr_populate.sql
+	sql hr/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_HR/hr_code.sql
+	sql hr/oracle@localhost:1521/FREEPDB1 @/home/oracle/bin/buildTimeRestEnableHR.sql
+	sql sys/oracle@localhost:1521/FREEPDB1 as sysdba @/tmp/1/create_hr_dev_workspace.sql
+	sql sh/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_SH/sh_create.sql
+	sql sh/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_SH/sh_populate.sql
+	sql sh/oracle@localhost:1521/FREEPDB1 @/home/oracle/bin/buildTimeRestEnableSH.sql
+	sql co/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_CO/co_create.sql
+	sql co/oracle@localhost:1521/FREEPDB1 @/home/oracle/ReBuildScriptSQLDev_CO/co_populate.sql
+	sql co/oracle@localhost:1521/FREEPDB1 @/home/oracle/bin/buildTimeRestEnableCO.sql
+	sql system/oracle@localhost:1521/FREEPDB1 @/tmp/1/dropoldapexusers.sql
+	echo "grant SODA_APP to HR;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "alter session set \"_oracle_script\"=true;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "DROP USER APEX_LISTENER CASCADE;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+	echo "DROP USER APEX_REST_PUBLIC_USER CASCADE;" | sqlplus system/oracle@localhost:1521/FREEPDB1
+    fi
+fi
+exit 0
+    
+if test -f /tmp/1/ords.zip
+then
+	if test -d /home/oracle/sqldeveloper
 	then
 		if test -f /tmp/1/apex.zip
 		then
@@ -44,12 +108,12 @@ then
 			echo PROGRESS: NOTE ords may have an apex prerequisite in the config files used for this demo.
 		fi
 
-		echo WARNING REPLACING SQLDEVORDS WITH ORDS EXPLICITLY DOWNLOADED.
-		cd /home/oracle/sqldeveloper
-		rm -rf ords 2>/dev/null
-		mkdir ords
-		cd ords
-		unzip /tmp/1/ords.zip
+#HACK		echo WARNING REPLACING SQLDEVORDS WITH ORDS EXPLICITLY DOWNLOADED.
+#HACK		cd /home/oracle/sqldeveloper
+#HACK		rm -rf ords 2>/dev/null
+#HACK		mkdir ords
+#HACK		cd ords
+#HACK		unzip /tmp/1/ords.zip
 	fi
 	cd /home/oracle
 	mkdir ords
@@ -71,7 +135,7 @@ then
 	    cat /home/oracle/ords/ords_params_vmconfig.properties.x | sed 's/rest.services.ords.add=false/rest.services.ords.add=true/g' > /home/oracle/ords/ords_params_vmconfig.properties
 	else
             mkdir /home/oracle/ords/thestatic
-	    echo "grant dba to APEX_PUBLIC_USER identified by oracle;" | sqlplus system/oracle@localhost:1521/ORCL
+	    echo "grant dba to APEX_PUBLIC_USER identified by oracle;" | sqlplus system/oracle@localhost:1521/FREEPDB1
 	    cat /home/oracle/ords/ords_params_vmconfig.properties.x | sed 's/rest.services.ords.add=false/rest.services.ords.add=true/g'| sed 's/rest.services.apex.add=true/rest.services.apex.add=false/g' | sed 'sZ/home/oracle/apex/imagesZ/home/oracle/ords/thestaticZg' > /home/oracle/ords/ords_params_vmconfig.properties
 	fi
 
@@ -87,8 +151,10 @@ then
 	set timeout 600
 	spawn java -jar /home/oracle/ords/ords.war install --parameterFile /home/oracle/ords/ords_params_vmconfig.properties simple
 
+	expect -regexp "Enter the administrator username." {send "sys\r"}
 	expect -regexp "Enter the database password for SYS AS SYSDBA." {send "oracle\r"}
 	expect -regexp "Confirm password." {send "oracle\r"}
+        expect -regexp "Enter a number to select a feature to enable .1. SQL Developer Web .2. REST Enabled SQL .3. None .1.." {send "1\r"}
 	expect -regexp " if using HTTPS .1.." {send "1\r"}
 	expect -regexp "something the WiLl Never Happen" {send "jingle bella\r"}
 	interact' > ~/bin/x.sh

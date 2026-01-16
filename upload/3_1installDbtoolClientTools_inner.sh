@@ -29,6 +29,15 @@
 dbus-launch gsettings set org.gnome.nautilus.icon-view default-zoom-level small
 mkdir -p /home/oracle/java
 mkdir -p /home/oracle/Desktop/images
+cp /tmp/1/FUTC.txt /home/oracle/Desktop/license.txt
+chmod 444 /home/oracle/Desktop/license.txt
+chown oracle /home/oracle/Desktop/license.txt
+cp /tmp/1/'Oracle AI Database 26ai Free - Production.html' /home/oracle/Desktop/'Oracle AI Database 26ai Free.html'
+chmod 444 /home/oracle/Desktop/'Oracle AI Database 26ai Free.html'
+chown oracle /home/oracle/Desktop/'Oracle AI Database 26ai Free.html'
+cp /tmp/1/'Oracle AI Database 26ai Free - Production.html' /home/oracle/Release.html
+chmod 444 /home/oracle/Release.html
+chown oracle /home/oracle/Release.html
 if test -f /tmp/1/jdk8x64.tar.gz
 then
 	mv /tmp/1/jdk8x64.tar.gz /home/oracle/java
@@ -41,10 +50,11 @@ then
 	rm jdk*.tar
 	cd -
 else
-	~oracle/buildTimeReportSkippingFile.sh jdk8x64tar.gz
+    ~oracle/buildTimeReportSkippingFile.sh jdk8x64tar.gz
+    ~oracle/buildTimeReportSkippingFile.sh YOU_REALLY_NEED_JAVA11
 fi
 
-if test -f /tmp/1/sqldev.zip
+if test -f /tmp/1/sqldev.notshipping.zip
 then
 	mv /tmp/1/sqldev.zip  /home/oracle/
 	touch /tmp/1/sqldev.zip
@@ -73,7 +83,7 @@ else
 	~oracle/buildTimeReportSkippingFile.sh sqlcl.zip
 fi
 mkdir ~oracle/bin
-if test -f /tmp/1/sqldev.zip
+if test -f /tmp/1/sqldev.notshipping.zip
 then
 	echo '#!/bin/bash
 	#should do image or desktop
@@ -94,6 +104,24 @@ then
 	export DONOTSETTWO_TASK=true
 	. ~oracle/.bashrc
 	. /home/oracle/bin/dbenv
+		if test "m$TNS_ADMIN" = "m"
+	then
+		export TNS_ADMIN=$ORACLE_HOME/network/admin
+	fi
+	unset ORACLE_HOME
+	unset CLASSPATH
+	unset LD_LIBRARY_PATH
+	bash /home/oracle/sqlcl/bin/sql "$@"
+	'> /home/oracle/bin/sqlo
+	echo '#!/bin/bash
+	#set TWO_TASK for UI
+	. ~oracle/.bashrc
+	/home/oracle/bin/sqlo "$@"
+	'> /home/oracle/bin/sqluio
+	echo '#!/bin/bash
+	export DONOTSETTWO_TASK=true
+	. ~oracle/.bashrc
+	. /home/oracle/bin/dbenv
 	bash /home/oracle/sqlcl/bin/sql "$@"
 	'> /home/oracle/bin/sql
 	echo '#!/bin/bash
@@ -101,6 +129,7 @@ then
 	. ~oracle/.bashrc
 	/home/oracle/bin/sql "$@"
 	'> /home/oracle/bin/sqlui
+	chown oracle /home/oracle/bin/sql*
 fi
 #temporary until sqlcl icon gets given
 cp /tmp/1/runTimeSQLCLIcon.png ~/Desktop/images
@@ -109,6 +138,8 @@ chmod 644 ~/Desktop/images/runTimeSQLCLIcon.png
 #chmod 644 ~/Desktop/images/runTimeClickHere.png
 if test -f /tmp/1/sqlcl.zip
 then
+	chmod 755 /home/oracle/bin/sqlo 
+	chmod 755 /home/oracle/bin/sqluio
 	chmod 755 /home/oracle/bin/sql 
 	chmod 755 /home/oracle/bin/sqlui
 	echo '[Desktop Entry]
@@ -125,7 +156,7 @@ fi
 #cp /tmp/1/"Click here to Start.desktop" /home/oracle/Desktop
 #set -x
 #actually made further up this script
-if test /tmp/1/sqldev.zip
+if test /tmp/1/sqldev.notshipping.zip
 then
 cp /tmp/1/"SQL Developer.desktop" /home/oracle/Desktop/
 fi
@@ -136,7 +167,7 @@ fi
 #echo secretSauce342|sudo -S rpm -i uln-internal-setup-3.0.1-2.el6.noarch.rpm
 #echo secretSauce342|sudo -S yum update 
 #busted - speed over efficientcy - ie hard to keep the size low. at least delete the /u01/download  files before creating the database. remember to delete yum cash saves about a half a gig..
-export MODNAME=modeler.zip
+export MODNAME=modeler.notshipping.zip
 if test -f /tmp/1/$MODNAME
 then
 mv /tmp/1/$MODNAME  /home/oracle/
@@ -162,7 +193,7 @@ echo '#!/bin/bash
 . ~oracle/.bashrc
 . /home/oracle/bin/dbenv
 cd /home/oracle/datamodeler
-bash ./datamodeler.sh "$@"' > /home/oracle/bin/datamodeler
+echo "$JAVA_HOME" | bash ./datamodeler.sh "$@"' > /home/oracle/bin/datamodeler
 chmod 755 /home/oracle/bin/datamodeler
 else
 ~oracle/buildTimeReportSkippingFile.sh $MODNAME
@@ -180,10 +211,10 @@ if test "m$DBENV" = "m"
 then
 export TMP=/tmp
 export TMPDIR=$TMP
-export ORACLE_UNQNAME=orclcdb
+export ORACLE_UNQNAME=orcl
 export ORACLE_BASE=/u01/app/oracle
 export ORACLE_HOME=$ORACLE_BASE/product/version/db_1
-export ORACLE_SID=orclcdb
+export ORACLE_SID=orcl
 export PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
@@ -206,21 +237,21 @@ fi
 export PATH=$JAVA_HOME/bin:/home/oracle/bin:/home/oracle/sqlcl/bin:/home/oracle/sqldeveloper:/home/oracle/datamodeler:$PATH:/home/oracle/sqlcl/bin:/home/oracle/sqldeveloper:/home/oracle/bin
 export JAVAENV=true
 fi'>>/home/oracle/.bashrc
-ed -s /home/oracle/Desktop/'Click here to Start.desktop' <<< $',s/Click here to Start/Click here to Start Labs/g\nw'
+#ed -s /home/oracle/Desktop/'Click here to Start.desktop' <<< $',s/Click here to Start/Click here to Start Labs/g\nw'
 echo '
 bash /tmp/1/buildTimeSetupRestClient.sh
 export LD_LIBRARY_PATH=
 cd ~/Desktop
 echo only rest client worked do this again at the end icon size seems almost similar whether trusted or not
 dbus-launch gio set "Rest Client.desktop" "metadata::trusted" yes
-dbus-launch gio set "SQL Developer.desktop" "metadata::trusted" yes
-dbus-launch gio set "Oracle-datamodeler.desktop" "metadata::trusted" yes
+#HACK dbus-launch gio set "SQL Developer.desktop" "metadata::trusted" yes
+#HACK dbus-launch gio set "Oracle-datamodeler.desktop" "metadata::trusted" yes
 dbus-launch gio set "Click here to Start.desktop" "metadata::trusted" yes
 dbus-launch gio set "sql.desktop" "metadata::trusted" yes
 ' > /tmp/icons.sh
 bash /tmp/icons.sh
-cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
-cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
+#HACK cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
+#HACK cp /tmp/1/runTimeSQLDeveloperIcon.png /home/oracle/Desktop/images
 cp /tmp/1/runTimeLabStylesheet.css /home/oracle/Desktop/style.css
 mkdir ~/.icons
 #errors out unnecessary? cp /home/oracle/runTimeClickHere.png /home/oracle/images/runTimeClickHere.png

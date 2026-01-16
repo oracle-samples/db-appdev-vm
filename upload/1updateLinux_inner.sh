@@ -34,8 +34,21 @@ cat /tmp/1/BUILD_CONFIG.sh
 echo $BUILD_WEB_PROXY
 if test "m$BUILD_WEB_PROXY" != "m"
 then
+    export http_proxy=$BUILD_WEB_PROXY
+    export https_proxy=$BUILD_WEB_PROXY
     printf '2i\nproxy='$BUILD_WEB_PROXY'\n.\nw\nq' | ed /etc/yum.conf
 fi
+cd /tmp
+cp /usr/share/rhn/ULN-CA-CERT /usr/share/rhn/ULN-CA-CERT.old
+wget https://linux-update.oracle.com/rpms/ULN-CA-CERT.sha2
+cp ULN-CA-CERT.sha2 /usr/share/rhn/ULN-CA-CERT
+if test "m$BUILD_WEB_PROXY" != "m"
+then
+    export http_proxy=
+    export https_proxy=
+fi 
+cd -
+       
 }
 function yum_update {
 #turn off packagekit - sometimes conflicts with yum - not available yet but mask seems to work
@@ -43,6 +56,11 @@ function yum_update {
 /bin/systemctl disable packagekit.service
 /bin/systemctl mask packagekit.service 
 yum -y update
+if test -f /usr/bin/ol_yum_configure.sh
+then
+/usr/bin/ol_yum_configure.sh
+rm /usr/bin/ol_yum_configure.sh
+fi
 yum -y grouplist
 yum -y groups list
 yum -y groups install "Server with GUI"
@@ -50,7 +68,11 @@ yum -y install expect
 yum -y install gcc
 yum -y install kernel-uek-devel
 yum -y install kernel-headers
-yum -y install oracle-database-preinstall-18c
+#yum -y install oracle-database-preinstall-19c
+yum -y install rhn-setup
+yum -y install rhn-client-tools
+yum -y install rhn-check
+yum -y install rhn-setup-gnome
 #oracle-rdbms-server-12cR2-preinstall
 usermod -a -g oinstall -G dba,wheel oracle
 #need to remove the yum proxy
@@ -66,12 +88,28 @@ expect -regexp {m for help.: } { send "p\r" }
 expect -regexp {m for help.: } { send "w\r" }
 expect -regexp {something the WiLl Never Happen} {send "jingle bella\r"}
 interact' > /tmp/xp.sh
-chmod 755 /tmp/xp.sh
+#chmod 755 /tmp/xp.sh
 #following line will $?=1 as never happen not matched
-/tmp/xp.sh
+#/tmp/xp.sh
 }
 
 function make_disks {
+#mkfs.xfs -f /dev/sdb1
+#mkdir -p /opt/oracle
+#chmod 777 /opt/oracle
+#mount -t xfs /dev/sdb1 /opt/oracle
+#chmod 755 /opt/oracle
+#chown oracle /opt/oracle
+#ed -s /etc/fstab <<EOF
+#\$a
+#/dev/sdb1	/opt/oracle	xfs	defaults	0	0
+#.
+#w
+#EOF
+systemctl enable gdm.service
+systemctl set-default graphical.target
+}
+function make_disks_old {
 mkfs.xfs -f /dev/sdb1
 mkdir /u01
 chmod 777 /u01
@@ -90,17 +128,92 @@ systemctl set-default graphical.target
 
 function setup_desktop {
 cd /tmp
-#need to move oracle user before gnome gets started
+if test "HACK" = "HACK"
+then
+    echo skipping
+#    #need to move oracle user before gnome gets started
+#chmod 755 /home/oracle
+##move symbolic link from under me - work or fail fast
+#mkdir /home
+#chmod 755 /home
+#cp -Rp /home/* /home
+#chmod 755 /home/*
+##sometimes fails (10% of builds) if process running
+#ps -ef | grep oracle
+#rm -rf /home
+#ln -s /home /home
+else
+    #need to move oracle user before gnome gets started
 chmod 755 /home/oracle
 #move symbolic link from under me - work or fail fast
-mkdir /u01/userhome
-chmod 755 /u01/userhome
-cp -Rp /home/* /u01/userhome
-chmod 755 /u01/userhome/*
-#sometimes fails (10% of builds) if process running
-ps -ef | grep oracle
-rm -rf /home
-ln -s /u01/userhome /home
+#mkdir /home
+#chmod 755 /home
+#cp -Rp /home/* /home
+#chmod 755 /home/*
+##sometimes fails (10% of builds) if process running
+#ps -ef | grep oracle
+#rm -rf /home
+#ln -s /home /home
+fi
+#need a reboot (or finish) after extras install. check by lsmod | grep vbox
+su - oracle -c "bash -c 'mkdir ~/.config'"
+su - oracle -c "bash -c 'mkdir ~/Desktop; echo images>>~/Desktop/.hidden; echo style.css>>~/Desktop/.hidden'"
+su - oracle -c "bash -c 'echo yes >> ~/.config/gnome-initial-setup-done'"
+if test -f /tmp/1/demo.zip
+then
+su - oracle -c "echo '[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_US]=/home/oracle/runTimeClickHere.png
+Name[en_US]=Click here to Start Labs
+Exec=/usr/bin/firefox /home/oracle/Desktop/ODDHandsOnLabs.html \n
+Name=Start Here
+Icon=/home/oracle/runTimeClickHere.png
+' > /home/oracle/Desktop/'Click here to Start.desktop'"
+else
+su - oracle -c "echo '[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_US]=/home/oracle/runTimeClickHere.png
+Name[en_US]=Click here to Start Browser
+Exec=/usr/bin/firefox \n
+Name=Start Here
+Icon=/home/oracle/runTimeClickHere.png
+' > /home/oracle/Desktop/'Click here to Start.desktop'"
+fi
+su - oracle -c "chmod 755 ~/Desktop/'Click here to Start.desktop'"
+su - oracle -c "cp /tmp/1/runTimeClickHere.png ~oracle"
+}
+function setup_desktop_min {
+cd /tmp
+#if test "HACK" = "HACK"
+#then
+#    #need to move oracle user before gnome gets started
+#chmod 755 /home/oracle
+##move symbolic link from under me - work or fail fast
+#mkdir /home
+#chmod 755 /home
+#cp -Rp /home/* /home
+#chmod 755 /home/*
+##sometimes fails (10% of builds) if process running
+#ps -ef | grep oracle
+#rm -rf /home
+#ln -s /home /home
+#else
+#    #need to move oracle user before gnome gets started
+#chmod 755 /home/oracle
+##move symbolic link from under me - work or fail fast
+#mkdir /home
+#chmod 755 /home
+#cp -Rp /home/* /home
+#chmod 755 /home/*
+##sometimes fails (10% of builds) if process running
+#ps -ef | grep oracle
+#rm -rf /home
+#ln -s /home /home
+#fi
 #need a reboot (or finish) after extras install. check by lsmod | grep vbox
 su - oracle -c "bash -c 'mkdir ~/.config'"
 su - oracle -c "bash -c 'mkdir ~/Desktop; echo images>>~/Desktop/.hidden; echo style.css>>~/Desktop/.hidden'"
@@ -159,7 +272,16 @@ TimedLoginEnable=true\
 TimedLogin=oracle\
 TimedLoginDelay=2/g' > /etc/gdm/custom.conf
 }
+function disable_ipv6 {
+#echo 'GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX ipv6.disable=1"'>> /etc/default/grub
+#grub2-mkconfig -o /boot/grub2/grub.cfg
+#grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
 
+echo '
+net.ipv6.conf.all.disable_ipv6 = 1                                                                                    
+net.ipv6.conf.default.disable_ipv6 = 1'>> /etc/sysctl.conf
+    
+}
 #
 #Main engine start
 #
@@ -176,8 +298,10 @@ rm -rf /tmp/put_files_here
 setup_proxy "$@"
 yum_update
 make_disks
-setup_desktop
+setup_desktop_min
+#setup_desktop
 setup_resolution
+disable_ipv6
 
 export SHNOW=`date +%s`
 export SHDUR=`expr $SHNOW - $SHSTART`

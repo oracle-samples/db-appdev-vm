@@ -1,54 +1,56 @@
-Rem
-Rem Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. 
-Rem 
-Rem Licensed under the Apache License, Version 2.0 (the "License");
-Rem you may not use this file except in compliance with the License.
-Rem You may obtain a copy of the License at
-Rem 
-Rem     http://www.apache.org/licenses/LICENSE-2.0
-Rem 
-Rem Unless required by applicable law or agreed to in writing, software
-Rem distributed under the License is distributed on an "AS IS" BASIS,
-Rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Rem See the License for the specific language governing permissions and
-Rem limitations under the License. 
-Rem
-Rem Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. 
-Rem 
-Rem Licensed under the Apache License, Version 2.0 (the "License");
-Rem you may not use this file except in compliance with the License.
-Rem You may obtain a copy of the License at
-Rem 
-Rem     http://www.apache.org/licenses/LICENSE-2.0
-Rem 
-Rem Unless required by applicable law or agreed to in writing, software
-Rem distributed under the License is distributed on an "AS IS" BASIS,
-Rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-Rem See the License for the specific language governing permissions and
-Rem limitations under the License. 
-Rem  
-Rem
-Rem    NAME
-Rem      hr_code.sql - Create procedural objects for HR schema
-Rem
-Rem    DESCRIPTION
-Rem      Create a statement level trigger on EMPLOYEES
-Rem      to allow DML during business hours.
-Rem      Create a row level trigger on the EMPLOYEES table,
-Rem      after UPDATES on the department_id or job_id columns.
-Rem      Create a stored procedure to insert a row into the
-Rem      JOB_HISTORY table.  Have the above row level trigger
-Rem      row level trigger call this stored procedure. 
-Rem
-Rem    NOTES
-Rem
-Rem    CREATED by Nancy Greenberg - 06/01/00
-Rem
-Rem    MODIFIED   (MM/DD/YY)
-Rem    ahunold     05/11/01 - disable
-Rem    ahunold     03/03/01 - HR simplification, REGIONS table
-Rem    ahunold     02/20/01 - Created
-Rem
+rem
+rem Copyright (c) 2023 Oracle
+rem
+rem Permission is hereby granted, free of charge, to any person obtaining a
+rem copy of this software and associated documentation files (the "Software"),
+rem to deal in the Software without restriction, including without limitation
+rem the rights to use, copy, modify, merge, publish, distribute, sublicense,
+rem and/or sell copies of the Software, and to permit persons to whom the
+rem Software is furnished to do so, subject to the following conditions:
+rem
+rem The above copyright notice and this permission notice shall be included in
+rem all copies or substantial portions rem of the Software.
+rem 
+rem THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+rem IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+rem FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+rem THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+rem LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+rem FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+rem DEALINGS IN THE SOFTWARE.
+rem 
+rem NAME
+rem   hr_code.sql - Create procedural objects for HR schema
+rem
+rem DESCRIPTION
+rem    1. Creates a statement level trigger on the EMPLOYEES table
+rem       to allow DML during business hours.
+rem    2. Creates a row level trigger on the EMPLOYEES table,
+rem       after UPDATES on the department_id or job_id columns.
+rem    3. Creates a stored procedure to insert a row into the
+rem       JOB_HISTORY table.  
+rem    4. The defined row level trigger calls the stored procedure. 
+rem
+rem SCHEMA VERSION
+rem   21
+rem
+rem RELEASE DATE
+rem   03-FEB-2022
+rem
+rem SUPPORTED with DB VERSIONS
+rem   19c and higher
+rem 
+rem MAJOR CHANGES IN THIS RELEASE
+rem   
+rem
+rem SCHEMA DEPENDENCIES AND REQUIREMENTS
+rem   This script is called from the hr_install.sql script
+rem 
+rem INSTALL INSTRUCTIONS
+rem    Run the hr_install.sql script to call this script
+rem
+rem --------------------------------------------------------------------------
+
 
 SET FEEDBACK 1
 SET NUMWIDTH 10

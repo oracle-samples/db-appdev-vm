@@ -63,7 +63,10 @@ then
 	  mkdir $GITDIR
 	  cd $GITDIR
 	  curl -Lk https://raw.githubusercontent.com/oracle/xml-sample-demo/master/install/installGitHubRepositories.sh -o intallGitHubRepositories.sh
-	  export SYSPWD=$PASSWD
+cp intallGitHubRepositories.sh intallGitHubRepositories.sh.SAV	  
+cat intallGitHubRepositories.sh.SAV | sed '"'"'sZcd xml-sample-demoZcd xml-sample-demo;find . -name loadPurchaseOrders.sh -print | while read line; do cp "$line" "$line.OLD"; cat "$line".OLD | sed "'"sQsqlldr.exeQsqlldrQg"'" > "$line" ; rm "$line.OLD"; doneZg'"'"' > intallGitHubRepositories.sh
+rm intallGitHubRepositories.sh.SAV
+          export SYSPWD=$PASSWD
 	  sh intallGitHubRepositories.sh $PDB $DBA $PASSWD $PASSWD $XDBEXT $PASSWD $DEMOUSER $PASSWD $HOSTNAME $HTTPPORT $ORDSHOME
 	  unset SYSPWD
 	  export TWO_TASK=$PDB
@@ -76,10 +79,11 @@ then
 	  sh installHandsOnLab.sh $DBA $PASSWD $DEMOUSER $PASSWD $SERVERURL
 	  cd 
 	  #rm -rf $GITDIR
-	  rm ~/reset_xmldbjson
+	  #mv ~/reset_xmldbjson ~/saved_xmldbjson2_$$
+          rm ~/reset_xmldbjson
 	}
 	export TWO_TASK=
-	PDB=ORCL
+	PDB=FREEPDB1
 	PASSWD=oracle
 	DBA=MYDBA
 	XFILES=XFILES
@@ -136,7 +140,7 @@ echo ~oracle/bin/uploaddemos
     export DONOTSETTWO_TASK=true
     chmod 755 ./reset_xmldbjson
     echo 1690 is proxy set $http_proxy $HTTP_PROXY 
-    ./reset_xmldbjson > reset_xmldbjson.debuglog 2>&1
+    bash -x ./reset_xmldbjson > ~oracle/log/reset_xmldbjson.debuglog 2>&1
     export DONOTSETTWO_TASK=
     export TWO_TASK=ORCL
     export http_proxy=
@@ -147,7 +151,7 @@ echo ~oracle/bin/uploaddemos
     #change ORACLE_SID reference to ORCL
 
     cp /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh  /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh.SID
-    cat /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh.SID | sed 's/$ORACLE_SID/ORCL/g' > /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh
+    cat /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh.SID | sed 's/$ORACLE_SID/FREEPDB1/g' > /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh
     chmod 644 /home/oracle/Desktop/Database_Track/JSON/install/setupLab.sh
 
     #resolve HOLDIRECTORY
@@ -157,7 +161,7 @@ echo ~oracle/bin/uploaddemos
 
     #add ORCL TNSNAMES ALIAS
     #cp ~/Desktop/Database_Track/JSON/install/setupLab.sh ~/Desktop/Database_Track/JSON/install/setupLab.sh.ORIG
-    #cat ~/Desktop/Database_Track/JSON/install/setupLab.sh.ORIG | sed 's/@setupLab.sql ${USER} ${USERPWD}$/@setupLab.sql ${USER} ${USERPWD} ORCL/g'> ~/Desktop/Database_Track/JSON/install/setupLab.sh
+    #cat ~/Desktop/Database_Track/JSON/install/setupLab.sh.ORIG | sed 's/@setupLab.sql ${USER} ${USERPWD}$/@setupLab.sql ${USER} ${USERPWD} FREEPDB1/g'> ~/Desktop/Database_Track/JSON/install/setupLab.sh
     #only one needs it cannot remember which one
     cp reset_xmldb reset_xmldb.SAV
     (echo export TWO_TASK=ORCL; cat reset_xmldb.SAV) > reset_xmldb
@@ -165,7 +169,7 @@ echo ~oracle/bin/uploaddemos
     cp  reset_json  reset_json.SAV
     (echo export TWO_TASK=ORCL; cat reset_json.SAV) > reset_json
     rm reset_xmldb.SAV  reset_json.SAV
-
+bash /tmp/1/dodemosreplace.sh
 for f in rest_sqldev reset_xmldb reset_soup reset_apex reset_json reset_rest reset_soda4rest reset_soup_apex_only
 do
     if test -f "$f"

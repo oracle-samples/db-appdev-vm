@@ -28,19 +28,19 @@
 #set -x 
 # VM SPECIFIC/ testing only/ not for production use
 export TWO_TASK=
-export BASESEED=/u01/app/oracle/oradata/ORCLCDB
-export DEFAULTNEWPDBNAME=ORCL
+export BASESEED=/u01/app/oracle/oradata/FREE
+export DEFAULTNEWPDBNAME=FREEPDB1
 export CONNECT=/
 export TNSNAMESFILE=$ORACLE_HOME/network/admin/tnsnames.ora
 export THEPORT=1521
 export ADMINUSER=oracle
 export ADMINPASSWORD=oracle
 export USERSTABLESPACESIZE=50M
-if test -f /u01/userhome/oracle/unzipdemos/master.zip
+if test -f /home/oracle/unzipdemos/master.zip
 then
 export NOOP=NOOP
 else
-echo ERROR Sample schemas not available in /u01/userhome/oracle/unzipdemos/master.zip
+echo ERROR Sample schemas not available in /home/oracle/unzipdemos/master.zip
 exit 1
 fi
 #notes for test VM '$1' is the wanted pdb
@@ -54,7 +54,7 @@ then
 fi
 #todo check pdb exist ? for now let sql exit on error
 
-cd /u01/userhome/oracle/unzipdemos
+cd /home/oracle/unzipdemos
 rm -rf /home/oracle/unzipdemos/db-sample-schemas-master
 if test -d /home/oracle/unzipdemos/db-sample-schemas-master
 then
@@ -68,7 +68,7 @@ perl -p -i.bak -e 's#__SUB__CWD__#'$(pwd)'#g' *.sql */*.sql */*.dat
 fi
 echo "alter pluggable database $PDB open;
 alter session set container=$PDB;
-@/u01/userhome/oracle/unzipdemos/db-sample-schemas-master/mksample oracle oracle oracle oracle oracle oracle oracle oracle USERS TEMP /tmp/ localhost:$THEPORT/$PDB
+@/home/oracle/unzipdemos/db-sample-schemas-master/mksample oracle oracle oracle oracle oracle oracle oracle oracle USERS TEMP /tmp/ localhost:$THEPORT/$PDB
 exit 0
 " | sqlplus $CONNECT as sysdba
 export THEEXIT=$?

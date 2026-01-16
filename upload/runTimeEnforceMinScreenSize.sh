@@ -24,6 +24,13 @@
 #
 #################################################################################
 
+if test -f ~/setsizeStartTerminal.sh
+then
+	echo sleep 6 > /tmp/doit99
+	echo gnome-terminal -e  ~/setsizeStartTerminal.sh --geometry=60x20+243+0 >> /tmp/doit99
+	nohup bash /tmp/doit99 >> /tmp/emergencylog 2>&1 &
+fi
+
 
 #allow for 50 retries 500 for first xrandr and error out on 7 seconds.
 #set -x
@@ -94,13 +101,114 @@ echo 'try JDBC REST driver: sql HRREST/oracle@http://localhost:8080/ords/hrrest/
 fi
 fi
 else
-	echo No default readme.txt - minium install is Oracle linux 7.3 and Oracle Database 18.3
+	echo "
+*** Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free *** 
+
+
+*** Please note that this appliance is for testing purposes only, 
+as such it is unsupported and should not be used as a production environment. ***
+
+
+Database Information:
+Oracle SID    : free
+Pluggable DB  : freepdb1
+
+ALL PASSWORDS ARE : oracle
+
+Sample schemas have been preloaded (HR, OE, PM, IX, BI, AV, SH) for your convenience.
+
+Oracle REST Data Service (ORDS) and APEX are both installed, configured, and available at startup.
+Port Forwards are defined for HTTP and SQL*Net, these are configurable in the Virtual Machine settings.
+  8080:8080
+  1521:1521
+  27017:27017
+
+From your host, simply launch:
+ http://localhost:8080/ords to launch APEX
+ http://localhost:8080/ords/sql-developer to start SQL Developer Web
+ sql hr/oracle@localhost:1521/freepdb1 to get a SQLcl session for the Pluggable Database (PDB)
+ sql system/oracle@localhost:1521/free to get a SQLcl session for the Container Database (CDB)
+
+Oracle Database API for MongoDB connection details: --tlsAllowInvalidCertificates or similar and                                                                                  
+ mongodb://hr:oracle@localhost:27017/hr?authMechanism=PLAIN&authSource=$external&ssl=true&retryWrites=false&loadBalanced=true
+
+The HR schema is REST enabled, you can login to SQL Developer Web using:
+  HR/oracle
+
+APEX Application Information
+
+To develop an APEX app against the HR schema, visit http://localhost:8080/ords/apex 
+and use the APEX Builder login page for the HR_DEV workspace 
+with credentials: HR_ADMIN / oracle
+
+To manage the APEX instance, visit http://localhost:8080/ords/apex, scroll to the 
+bottom of the APEX Builder login page and click the Administration link to sign 
+in to Administration Services with credentials: ADMIN / oracle
+
+"
 fi
 
 cd ~
+ps -e | grep firefox > /dev/null 2>&1
+if test "m$?" != "m0"
+then
+nohup firefox --new-tab "file:///home/oracle/Desktop/Oracle%20AI%20Database%2026ai%20Free.html">> /tmp/firefoxlog$$ 2>&1 &
+fi
+gsettings set org.gnome.desktop.interface text-scaling-factor 0.99
+gio set /home/oracle/Desktop/"Click here to Start".desktop "metadata::trusted" true
+gio set /home/oracle/Desktop/sql.desktop "metadata::trusted" true
+touch /home/oracle/Desktop/"Click here to Start".desktop /home/oracle/Desktop/sql.desktop
 bash
 exit 0'>~/setsizeStartTerminal.sh
 chmod 744 ~/setsizeStartTerminal.sh
+	echo "
+*** Oracle AI Database 26ai Free Release 23.26.0.0.0 - Develop, Learn, and Run for Free *** 
+
+
+*** Please note that this appliance is for testing purposes only, 
+as such it is unsupported and should not be used as a production environment. ***
+
+
+Database Information:
+Oracle SID    : free
+Pluggable DB  : freepdb1
+
+ALL PASSWORDS ARE : oracle
+
+Sample schemas have been preloaded (HR, HRREST, CO, SH) for your convenience.
+
+Oracle REST Data Service (ORDS) and APEX are both installed, configured, and available at startup.
+Port Forwards are defined for HTTP and SQL*Net, these are configurable in the Virtual Machine settings.
+  8080:8080
+  1521:1521
+  27017:27017 
+
+From your host, simply launch:
+ http://localhost:8080/ords to launch APEX
+ http://localhost:8080/ords/sql-developer to start SQL Developer Web
+ sql hr/oracle@localhost:1521/freepdb1 to get a SQLcl session for the Pluggable Database (PDB)
+ sql system/oracle@localhost:1521/free to get a SQLcl session for the Container Database (CDB)
+
+Oracle Database API for MongoDB connection details: --tlsAllowInvalidCertificates or similar and
+ mongodb://hr:oracle@localhost:27017/hr?authMechanism=PLAIN&authSource=$external&ssl=true&retryWrites=false&loadBalanced=true    
+
+The HR schema is REST enabled, you can login to SQL Developer Web using:
+  HR/oracle
+
+APEX Application Information
+
+To develop an APEX app against the HR schema, visit http://localhost:8080/ords/apex
+and use the APEX Builder login page for the HR_DEV workspace
+with credentials: HR_ADMIN / oracle
+
+To manage the APEX instance, visit http://localhost:8080/ords/apex, scroll to the
+bottom of the APEX Builder login page and click the Administration link to sign
+in to Administration Services with credentials: ADMIN / oracle
+
+
+">~/Desktop/README.txt
+#echo "FUTC.txt available at: https://www.oracle.com/downloads/licenses/oracle-free-license.html" > ~/Desktop/FUTC.txt
+rm -f ~/Desktop/'SQL Developer.desktop'
 #give time for startup
 sleep 4 
 nohup gnome-terminal -e  ~/setsizeStartTerminal.sh --geometry=60x20+243+0 &

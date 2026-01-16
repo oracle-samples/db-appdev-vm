@@ -1,97 +1,216 @@
 {
-"variables": {
-	"iso_downloaded": null,
-	"oracle_database_downloaded": null,
-        "proxy": "",
-	"skip_export": "true" 
-},
-    "provisioners": [
-	{
-	    "type": "file",
-	    "source": "upload",
-	    "destination": "/tmp"
-	},
-        {
-            "type": "file",
-            "source": "put_files_here",
-            "destination": "/tmp"
-        },
-	{
-	    "type": "shell",
-	    "inline": ["echo 'oracle' | sudo -S -E  bash -c 'mv /tmp/upload /tmp/1 && chmod -R 777 /tmp/1 && chown -R oracle /tmp/1 && /tmp/1/1updateLinux.sh {{user `proxy`}} && /sbin/shutdown -r +1'"]
-	},
-	{
-	    "pause_before": "200s",
-  	    "type": "shell",
-  	    "inline": ["echo not necessaryQQQ /home/oracle/bin/nuketimestamps>/dev/null && echo 'oracle'|sudo -S -E bash -c '/tmp/1/2afterFirstReboot.sh 2>&1 | tee /root/log$$ && /tmp/1/3topLevel.sh && /sbin/shutdown -r +1'"
-              ]
-	},
-	{
-           "pause_before": "200s",
-	    "type": "file",
-	    "source": "log.zip",
-	    "destination": "log.zip",
-	    "direction": "download"
-	},
-	{
-  	    "type": "shell",
-  	    "inline": ["rm log.zip"
-              ]
-	}
-    ],
-    "builders": [
-	{
-	    "type": "virtualbox-iso",
-      "ssh_skip_nat_mapping": true,
+  "builders": [
+    {
+      "boot_command": [
+        "<wait5>",
+        "<up><wait><tab><wait5><bs><bs><bs><bs><bs> inst.text<wait> inst.noverifyssl <wait>",
+        "inst.ks=http://dbtools.oraclecorp.com/builds/vm122/nonvmbuild/buildTimeConfig.cfg<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": "60000",
+      "export_opts": [
+        "--vsys",
+        "0",
+        "--eulafile",
+        "license.txt",
+        "--product",
+        "Oracle AI Database 26ai 23.26, Application Express 24.2, REST Data Services 25.3.0, SQLCL 25.3.0",
+        "--producturl",
+        "http://otn.oracle.com",
+        "--vendor",
+        "Oracle",
+        "--vendorurl",
+        "http://www.oracle.com",
+        "--version",
+        "Oct_2025"
+      ],
+      "format": "ova",
+      "guest_additions_mode": "upload",
+      "guest_os_type": "Oracle_64",
+      "hard_drive_interface": "sata",
+      "http_directory": "upload",
+      "iso_checksum": "md5:307bb39212898d334b1bb88553810215",
+      "iso_url": "OracleLinux-R8-U10-x86_64-dvd.iso",
+      "keep_registered": "{{user `skip_export`}}",
+      "output_directory": "output",
+      "post_shutdown_delay": "30s",
+      "shutdown_command": "echo 'oracle' | sudo -S shutdown -P now",
+      "shutdown_timeout": "10m",
+      "skip_export": "{{user `skip_export`}}",
+      "skip_nat_mapping": true,
       "ssh_host": "127.0.0.1",
-      "ssh_port": 2222,
-	    "disk_size": "30000",
-	    "guest_os_type": "Oracle_64",
-	    "hard_drive_interface": "sata",
-	    "boot_command": [
-		"<wait10>",
-		"<tab><wait5> text<wait> noverifyssl <wait>",
-		"ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/buildTimeConfig.cfg<enter><wait>"
-	    ],
-	    "vboxmanage": [
-   		[ "modifyvm", "{{.Name}}", "--memory", "4096" ],
-   		[ "modifyvm", "{{.Name}}", "--cpus", "2" ],
-		[ "createhd", "--filename", "Oracle DB Developer VM__2.vdi", "--size", "30000"],
-		[ "storageattach",  "{{.Name}}", "--storagectl", "SATA Controller", "--port", "1", "--device", "0" ,"--type", "hdd", "--medium", "Oracle DB Developer VM__2.vdi"],
-		[ "modifyvm", "{{.Name}}", "--clipboard", "bidirectional"],
-		[ "modifyvm", "{{.Name}}", "--draganddrop", "bidirectional"],
-		[ "modifyvm", "{{.Name}}", "--paravirtprovider", "kvm"],
-		[ "modifyvm", "{{.Name}}", "--natpf1", "net8,tcp,,1521,,1521"],
-		[ "modifyvm", "{{.Name}}", "--natpf1", "ssh,tcp,,2222,,22"],
-		[ "modifyvm", "{{.Name}}", "--natpf1", "apex8080,tcp,,8080,,8080"],
-		[ "modifyvm", "{{.Name}}", "--natpf1", "apex8081,tcp,,8081,,8081"],
-		[ "modifyvm", "{{.Name}}", "--natpf1", "ords9090,tcp,,9090,,9090"], 
-		[ "modifyvm", "{{.Name}}", "--audio", "none"],
-		[ "modifyvm", "{{.Name}}", "--vram", "128"]
-   		],
-   	    "vboxmanage_post": [
-   			[ "modifyvm", "{{.Name}}", "--memory", "2048" ],
-   		[ "modifyvm", "{{.Name}}", "--cpus", "1" ],
-		[ "storageattach", "{{.Name}}", "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "dvddrive",  "--medium", "emptydrive"]
-  	    ],
-	    "guest_additions_mode": "upload",
-	    "iso_url": "OracleLinux-R7-U3-Server-x86_64-dvd.iso",
-	    "iso_checksum_type": "md5",
-	    "iso_checksum": "e44eff40f3a16ffa008285e5c52e1199",
-	    "format": "ova",
-	    "boot_wait": "10s",
-	    "ssh_username": "oracle",
-	    "ssh_password": "oracle",
-	    "ssh_wait_timeout": "2400s",
-	    "output_directory": "output",
-	    "shutdown_command": "echo 'oracle' | sudo -S shutdown -P now",
-	    "post_shutdown_delay": "30s",
-	    "keep_registered": "{{user `skip_export`}}",
-	"skip_export": "{{user `skip_export`}}",
-		"shutdown_timeout": "10m",
-		"vm_name": "Oracle DB Developer VM",
-		"http_directory":"upload",
-"export_opts": ["--vsys", "0","--eulafile","license.txt", "--product", "Oracle RDBMS 18.3, Application Express 18.1,REST Data Services 18.2,SQL Developer 18.2", "--producturl", "http://otn.oracle.com", "--vendor", "Oracle", "--vendorurl", "http://www.oracle.com", "--version", "July_2017"]
-	}
-    ]
+      "ssh_password": "oracle",
+      "ssh_port": 2223,
+      "ssh_timeout": "3600s",
+      "ssh_username": "oracle",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "8192"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--clipboard",
+          "bidirectional"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--draganddrop",
+          "bidirectional"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--paravirtprovider",
+          "kvm"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "net8,tcp,,1521,,1521"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "ssh,tcp,,2223,,22"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "apex8080,tcp,,8080,,8080"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "apex8081,tcp,,8081,,8081"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "ords9090,tcp,,9090,,9090"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "mongodbords,tcp,,27017,,27017"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--audio",
+          "none"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--graphicscontroller",
+          "VMSVGA"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "128"
+        ]
+      ],
+      "vboxmanage_post": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "4096"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+        [
+          "storageattach",
+          "{{.Name}}",
+          "--storagectl",
+          "IDE Controller",
+          "--port",
+          "1",
+          "--device",
+          "0",
+          "--type",
+          "dvddrive",
+          "--medium",
+          "emptydrive"
+        ]
+      ],
+      "vm_name": "Oracle AI Database 26ai Free"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/tmp",
+      "source": "upload",
+      "type": "file"
+    },
+    {
+      "destination": "/tmp",
+      "source": "put_files_here",
+      "type": "file"
+    },
+    {
+      "inline": [
+        "echo 'oracle' | sudo -S -E  bash -c 'mv /tmp/upload /tmp/1 \u0026\u0026 chmod -R 777 /tmp/1 \u0026\u0026 chown -R oracle /tmp/1 \u0026\u0026 /tmp/1/1updateLinux.sh {{user `proxy`}} \u0026\u0026 (chmod 755 /home/oracle) \u0026\u0026 /sbin/shutdown -r +1 \u0026\u0026 echo need yum update reboot twice to reach update 7u6 UEK 5'"
+      ],
+      "type": "shell"
+    },
+    {
+      "inline": [
+        "echo 'oracle'|sudo -S -E bash -c 'yum -y update > /root/log$$ 2>\u00261  \u0026\u0026 /sbin/shutdown -r +1'"
+      ],
+      "pause_before": "200s",
+      "type": "shell"
+    },
+    {
+      "inline": [
+        "echo not necessaryQQQ /home/oracle/bin/nuketimestamps>/dev/null \u0026\u0026 echo 'oracle'|sudo -S -E bash -c '/tmp/1/2afterFirstReboot.sh 2>\u00261 | tee /root/log$$ \u0026\u0026 /tmp/1/3topLevel.sh \u0026\u0026 /sbin/shutdown -r +1'"
+      ],
+      "pause_before": "200s",
+      "type": "shell"
+    },
+    {
+      "destination": "log.zip",
+      "direction": "download",
+      "pause_before": "200s",
+      "source": "log.zip",
+      "type": "file"
+    },
+    {
+      "inline": [
+        "rm -f log.zip buildTimeEndOfAllScripts.sh buildTimeEnd.sh buildTimeReportSkippingFile.sh custom.conf.x runTimeStagesText.txt runTimeStartScript.sh cre_hr.log shrink.sh "
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "iso_downloaded": null,
+    "oracle_database_downloaded": null,
+    "proxy": "",
+    "skip_export": "true"
+  }
 }
+

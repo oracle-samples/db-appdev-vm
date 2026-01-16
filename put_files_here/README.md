@@ -2,22 +2,18 @@
 
 Required Files
 --------------
-* OracleLinux-R7-U3-Server-x86_64-dvd.iso (needs to be this exactly md5 checked)
-* linux\*122*_database.zip (12201 has been verified - silent install may be incompatible with later versions)
+* OracleLinux-R8-U7-x86_64-dvd.iso (needs to be this exactly md5 checked)
+* oracle-database-free-23c-1.0-1.el8.x86_64.rpm - Sept 2023 release - some hardcoding on file name
+* oracle-database-preinstall-23c-1.0-0.5.el8.x86_64.rpm - free initial download - some harcoding may change for production
 
 Optional Downloads
 --------------
 If these files are available in the **put_files_here** directory, the build will try and install them.  
 
-* demos.zip - **Oracle Hands on Labs demos**
-* jdk-8u\*-linux-x64.tar.gz - **Oracle JDK**
-* sqldeveloper-\*-no-jre.zip - **Oracle SQL Developer**
-* sqlcl-\*-no-jre.zip - **Oracle SQLcl**
-* apex_5\*.zip - **Oracle Application Express**
+* jdk-11\*_linux-x64_bin.tar.gz - **Oracle JDK**
+* sqlcl-\*.zip - **Oracle SQLcl**
+* apex_\*.zip - **Oracle Application Express**
 * ords\*.zip - **Oracle REST Data Services** 
-* datamodeler-\*-no-jre.zip **Oracle SQLDeveloper Data Modeler**
-* mozillablob.zip - **firefox .mozilla for (json viewer) plugins and or bookmarks**
-* storm.zip - **exp dump of non sensative material. For geo location optional demo.**
-* reset_xmldbjson
-* master.zip - **Oracle Sample Schema**
+* mozillablob.zip - **firefox .mozilla for  bookmarks/start URL** - https://artifacthub-phx.oci.oraclecorp.com/artifactory/dbtools-adhoc-artifact/oracle/dbtools/developerday/mozillaBlob.zip.23.3.0.1
+* master.zip - **Oracle Sample Schema** old version - https://artifacthub-phx.oci.oraclecorp.com/artifactory/dbtools-adhoc-artifact/oracle/dbtools/developerday/master.zip
 

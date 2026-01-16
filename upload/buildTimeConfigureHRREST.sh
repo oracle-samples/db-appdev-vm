@@ -102,20 +102,14 @@ REM  the location of the demo scrip files in in the <ORACLE_DB_HOME>\Ora<90><10>
 
 CONNECT $NEWUSER/$NEWPASSWORD@&&your_Connect_String
 
-Prompt hr_cre
-@@hr_cre
+Prompt hr_create
+@@hr_create
 
-Prompt hr_popul
-@@hr_popul
-
-Prompt hr_idx
-@@hr_idx
+Prompt hr_populate
+@@hr_populate
 
 Prompt hr_code
 @@hr_code
-
-Prompt hr_comnt
-@@hr_comnt
 
 Prompt What OBJECTS were created?
 column object_name format a30
@@ -129,3 +123,13 @@ Prompt Are there any INVALID OBJECTS?
 select object_name from user_objects where status='INVALID';
 " | sqlplus system/$MYSYSTEMPASSWORD@$CON
 sqlplus $NEWUSER/$NEWPASSWORD@$CON @/home/oracle/bin/buildTimeRestEnableHR.sql
+sqlplus hr/$NEWPASSWORD@$CON @/home/oracle/bin/buildTimeRestEnableHR.sql
+echo "begin
+    apex_instance_admin.add_workspace(
+	p_workspace_id   => 123459,
+        p_workspace      => 'HRREST',
+        p_primary_schema => 'HRREST');
+    commit;
+    end;
+/
+"|sqlplus system/$MYSYSTEMPASSWORD@$CON

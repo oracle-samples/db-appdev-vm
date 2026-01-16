@@ -1,0 +1,3 @@
+alter session set "_oracle_script"=true;
+DROP USER APEX_LISTENER CASCADE;
+DROP USER APEX_REST_PUBLIC_USER CASCADE;

@@ -26,7 +26,7 @@
 
 
 #mkdir /u01
-chmod 755 /u01
-chown oracle /u01
-chgrp dba /u01
+#HACKchmod 755 /u01
+#HACKchown oracle /u01
+#HACKchgrp dba /u01
 echo 127.0.0.1   vbgeneric vbgeneric.localdomain >> /etc/hosts
