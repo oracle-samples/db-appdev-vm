@@ -150,26 +150,11 @@ then
     printf '2i\nproxy='$BUILD_WEB_PROXY'\n.\nw\nq' | ed /etc/yum.conf
 fi
 
-#dnf -y localinstall /tmp/1/oracle-database-preinstall-23c-1.0-0.1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
 #Linux
 dnf -y localinstall /tmp/1/oracle-ai-database-preinstall-26ai-1.0-1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
-#dnf -y localinstall /tmp/1/oracle-database-preinstall-23ai-1.0-2.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
-#ARM
-#dnf -y localinstall /tmp/1/oracle-database-preinstall-23ai-1.0-3.el8.aarch64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
-#mkdir -p /opt/oracle >> ~oracle/log/3_0oracleinstall.log 2>&1
-#groupadd oinstall  >> ~oracle/log/3_0oracleinstall.log 2>&1
-#chown oracle:oinstall /opt/oracle >> ~oracle/log/3_0oracleinstall.log 2>&1
-#chgrp oinstall /opt/oracle >> ~oracle/log/3_0oracleinstall.log 2>&1
-#chmod 775 /opt/oracle >> ~oracle/log/3_0oracleinstall.log 2>&1
-#chgrp oinstall /opt/oracle >> ~oracle/log/3_0oracleinstall.log 2>&1
 #Linux
-#dnf -y localinstall /tmp/1/oracle-database-free-23ai-1.0-1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
 dnf -y localinstall /tmp/1/oracle-ai-database-free-26ai-23.26.0-1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
-#dnf -y localinstall /tmp/1/oracle-database-free-23ai-23.9-1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
-#ARM
-#dnf -y localinstall /tmp/1/oracle-database-free-23ai-1.0-1.el8.aarch64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
 
-#rpm -iv --nodeps /tmp/1/oracle-database-free-23ai-1.0-1.el8.x86_64.rpm >> ~oracle/log/3_0oracleinstall.log 2>&1
 (echo "oracle"; echo "oracle";) | /etc/init.d/oracle-free-26ai configure >> ~oracle/log/3_0oracleinstall.log 2>&1
 systemctl enable oracle-free-26ai
 chmod 755 /etc/init.d/oracle-free-26ai
