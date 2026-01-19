@@ -37,7 +37,7 @@ cd $ORACLE_HOME/apex
 echo apex not preinstalled anymore
 ls -l apxremov_con.sql
 
-cd /u01/userhome/oracle
+cd /home/oracle
 if test -f /tmp/1/apex.zip
 then
 	unzip /tmp/1/apex.zip
@@ -106,7 +106,7 @@ ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK;
 ALTER USER FLOWS_FILES ACCOUNT UNLOCK;
 "|$SQL_OR_SQLPLUS sys/oracle@localhost:1521/orcl as sysdba
 echo "alter session set container = orcl;
-@apex_epg_config.sql /u01/userhome/oracle"|$SQL_OR_SQLPLUS / as sysdba
+@apex_epg_config.sql /home/oracle"|$SQL_OR_SQLPLUS / as sysdba
 echo leave 8080 for ords
 echo "alter session set container = orcl;
 @apxconf
@@ -234,7 +234,7 @@ begin
    wwv_flow.g_import_in_progress := false;
    APEX_INSTANCE_ADMIN.SET_PARAMETER('PASSWORD_HISTORY_DAYS',0);
    APEX_INSTANCE_ADMIN.SET_PARAMETER('STRONG_SITE_ADMIN_PASSWORD','N');
-   APEX_INSTANCE_ADMIN.SET_PARAMETER('ACCOUNT_LIFETIME_DAYS',36500);
+   APEX_INSTANCE_ADMIN.SET_PARAMETER('ACCOUNT_LIFETIME_DAYS',9999);
 
 end;
 /

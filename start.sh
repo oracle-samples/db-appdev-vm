@@ -46,21 +46,25 @@ function cleanup {
 #
 function check_required_files {
 	export varsaccepted=
-	if test -f OracleLinux-R7-U3-Server-x86_64-dvd.iso
+	if test -f OracleLinux-R8-U10-x86_64-dvd.iso
         then
                 export varsaccepted=" -var iso_downloaded=y "
         else
-	    if test -f put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso
+	    if test -f put_files_here/OracleLinux-R8-U10-x86_64-dvd.iso
 	    then
 		export varsaccepted=" -var iso_downloaded=y "
-		mv put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso .
-		touch put_files_here/OracleLinux-R7-U3-Server-x86_64-dvd.iso
+		mv put_files_here/OracleLinux-R8-U10-x86_64-dvd.iso .
+		touch put_files_here/OracleLinux-R8-U10-x86_64-dvd.iso
 	    fi
 	fi
 	if test -f put_files_here/LINUX.X64_*_db_home.zip
 	then
 		export varsaccepted=" $varsaccepted -var oracle_database_downloaded=y " 
 	fi
+	if test -f put_files_here/oracle-ai-database-free-26ai*.x86_64.rpm
+	then
+	    export varsaccepted=" $varsaccepted -var oracle_database_downloaded=y " 
+	fi    
 	if test "m$2" = "mexport"
 	then
 	        export varsaccepted=" $varsaccepted -var proxy=$1 -var skip_export=false "
@@ -75,7 +79,8 @@ function check_required_files {
 # start the packer build with a proxy if it is set.
 #
 function start_packer_build {
-	packer build $varsaccepted packerConfig.json
+    echo HACK ADDED '-debug' to packer UNDONE
+	packer build $varsaccepted -on-error=abort packerConfig.json
 }
 
 #Lets go.

@@ -3,6 +3,7 @@
 3topLevel.sh PROGRESS: 3/4 3topLevel.sh - main kick off script i.e. yum and call subscripts
 3_1installDbtoolClientTools.sh PROGRESS: 3_1/4 3_1installDbtoolClientTools.sh - install dbtool client tools
 3_2installDatabase.sh PROGRESS: 3_2/4 3_2installDatabase.sh - install the database
+3_2installDatabaseXE.sh PROGRESS: 3_2/4 3_2installDatabaseXE.sh - install the database if XE
 3_3passwordDoNotExpire.sh PROGRESS: 3_3/4 3_3passwordDoNotExpire.sh - minor helper - e.g. passwords do not expire.
 3_4enableGeoRaster.sh PROGRESS: 3_4/4 3_4enableGeoRaster.sh - post database install and patch
 3_5unzipLabDemos.sh PROGRESS: 3_5/4 3_5unzipLabDemos.sh - demos (labs)

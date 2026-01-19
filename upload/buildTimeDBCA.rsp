@@ -577,7 +577,7 @@ variables=ORACLE_BASE_HOME=/u01/app/oracle/product/version/db_1,DB_UNIQUE_NAME=o
 # Default value : None
 # Mandatory     : NO
 #-----------------------------------------------------------------------------
-initParams=undo_tablespace=UNDOTBS1,sga_target=800MB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE=orclcdbXDB),diagnostic_dest={ORACLE_BASE},control_files=("{ORACLE_BASE}/oradata/{DB_UNIQUE_NAME}/control01.ctl", "{ORACLE_BASE}/fast_recovery_area/{DB_UNIQUE_NAME}/control02.ctl"),remote_login_passwordfile=EXCLUSIVE,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=200MB,nls_territory=AMERICA,local_listener=LISTENER_ORCLCDB,db_recovery_file_dest_size=12918MB,open_cursors=300,compatible=18.0.0,db_name=orclcdb,db_recovery_file_dest={ORACLE_BASE}/fast_recovery_area/{DB_UNIQUE_NAME},audit_trail=db
+initParams=undo_tablespace=UNDOTBS1,sga_target=800MB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE=orclcdbXDB),diagnostic_dest={ORACLE_BASE},control_files=("{ORACLE_BASE}/oradata/{DB_UNIQUE_NAME}/control01.ctl", "{ORACLE_BASE}/fast_recovery_area/{DB_UNIQUE_NAME}/control02.ctl"),remote_login_passwordfile=EXCLUSIVE,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=200MB,nls_territory=AMERICA,local_listener=LISTENER_ORCLCDB,db_recovery_file_dest_size=12918MB,open_cursors=300,compatible=19.0.0,db_name=orcdcdb,db_recovery_file_dest={ORACLE_BASE}/fast_recovery_area/{DB_UNIQUE_NAME},audit_trail=db
 
 #-----------------------------------------------------------------------------
 # Name          : sampleSchema

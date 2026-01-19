@@ -28,17 +28,17 @@
 . ~oracle/runTimeStartScript.sh
 
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
-echo alter pluggable database orcl open';'|$SQL_OR_SQLPLUS / as sysdba
+echo alter pluggable database orclcdb open';'|$SQL_OR_SQLPLUS / as sysdba
 
 #password do not expire
 $SQL_OR_SQLPLUS / as sysdba <<EOF
 alter profile DEFAULT limit password_life_time UNLIMITED;
-alter pluggable database orcl save state;
+alter pluggable database orclcdb save state;
 REM NEEDED ON 12.1
 alter system set "_ash_size"=25165824;
 EOF
 
-$SQL_OR_SQLPLUS system/oracle@localhost:1521/orcl <<EOF
+$SQL_OR_SQLPLUS system/oracle@localhost:1521/orclcdb <<EOF
 alter profile DEFAULT limit password_life_time UNLIMITED;
 EOF
 
@@ -49,7 +49,7 @@ echo END OT EXPECT32K 1690
 $SQL_OR_SQLPLUS / as sysdba <<EOF
 shutdown immediate
 startup
-alter pluggable database orcl open;
+alter pluggable database orclcdb open;
 EOF
 
 cp /tmp/1/createnewpdb ~oracle/bin

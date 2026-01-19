@@ -66,7 +66,7 @@ sqlplus -s / as sysdba <<EOF
 	@/tmp/shrink.sql
 
 EOF
-export TWO_TASK=ORCL
+export TWO_TASK=FREEPDB1
 sqlplus -s sys/oracle as sysdba <<EOF
 	set verify off
 	set feedback off
@@ -102,13 +102,13 @@ EOF
 export TWO_TASK=
 sqlplus -s / as sysdba <<EOF
 	CREATE UNDO TABLESPACE undotbs2
-	         DATAFILE '/u01/app/oracle/oradata/ORCLCDB/undotbs2.dbf'
+	         DATAFILE '/u01/app/oracle/oradata/FREE/undotbs2.dbf'
 	         SIZE 50M AUTOEXTEND ON NEXT 50M;
 	ALTER SYSTEM SET UNDO_TABLESPACE=UNDOTBS2 SCOPE=BOTH;
 	shutdown immediate;
 	startup;
 	DROP TABLESPACE undotbs1 INCLUDING CONTENTS AND DATAFILES;
-	alter pluggable database orcl open;
+	alter pluggable database free open;
 EOF
 export TWO_TASK=
 echo shutdown befor /dev/zero in case database goes nuts on full disk
@@ -117,11 +117,11 @@ sqlplus / as sysdba <<EOF
 	shutdown immediate;
 	exit 
 EOF
-export TWO_TASK=ORCL
+export TWO_TASK=FREEPDB1
 dd if=/dev/zero of=/tmp/bigfile bs=1024
 rm /tmp/bigfile
 ## 2nd change only necessary when switch to 2 disks.
-dd if=/dev/zero of=/u01/bigfile bs=1024
-rm /u01/bigfile
+#dd if=/dev/zero of=/u01/bigfile bs=1024
+#rm /u01/bigfile
 #last command has to exit 0
 exit 0

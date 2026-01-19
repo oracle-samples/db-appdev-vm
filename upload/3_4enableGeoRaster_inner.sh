@@ -27,7 +27,7 @@
 
 . ~oracle/runTimeStartScript.sh
 #post db install and open - pre non db core software install - no ords/apex...
-#assumption - database up, listener up, only cdb and pdb=orcl need to be updated, shutdown startup explicit at end
+#assumption - database up, listener up, only cdb and pdb=freepdb1 need to be updated, shutdown startup explicit at end
 #assumption - listener does not need to be restarted - if listener needs to be restarted - do it explicitly.lsnrctl stop lsnrctl start
 unset TWO_TASK
 $SQL_OR_SQLPLUS sys/oracle as sysdba <<EOF
@@ -44,10 +44,10 @@ $SQL_OR_SQLPLUS sys/oracle as sysdba <<EOF
 	exit;
 EOF
 
-$SQL_OR_SQLPLUS sys/oracle@localhost:1521/orcl as sysdba <<EOF
+$SQL_OR_SQLPLUS sys/oracle@localhost:1521/free as sysdba <<EOF
 	set echo on 
 	set verify on
-	select '1690 - CON_NAME should be ORCL' from dual;
+	select '1690 - CON_NAME should be FREE' from dual;
 	show con_name
 	--insert pdb sys actions here START
 	-- required for spacial
@@ -60,7 +60,7 @@ EOF
 $SQL_OR_SQLPLUS / as sysdba <<EOF
 	shutdown immediate
 	startup
-	alter pluggable database orcl open;
+	alter pluggable database free open;
 EOF
 
 . ~oracle/buildTimeEnd.sh

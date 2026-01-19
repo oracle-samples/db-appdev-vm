@@ -42,7 +42,7 @@
 #-------------------------------------------------------------------------------
 # Do not change the following system generated value. 
 #-------------------------------------------------------------------------------
-oracle.install.responseFileVersion=/oracle/install/rspfmt_dbinstall_response_schema_v18.0.0
+oracle.install.responseFileVersion=/oracle/install/rspfmt_dbinstall_response_schema_v19.0.0
 
 #-------------------------------------------------------------------------------
 # Specify the installation option.
@@ -63,6 +63,10 @@ UNIX_GROUP_NAME=oinstall
 # Windows based Operating System.
 #-------------------------------------------------------------------------------
 INVENTORY_LOCATION=/u01/app/oraInventory
+#-------------------------------------------------------------------------------
+# Specify the complete path of the Oracle Home. 
+#-------------------------------------------------------------------------------
+ORACLE_HOME=/u01/app/oracle/product/version/db_1
 
 #-------------------------------------------------------------------------------
 # Specify the complete path of the Oracle Base. 
@@ -125,6 +129,43 @@ oracle.install.db.OSKMDBA_GROUP=dba
 # The OSRACDBA_GROUP is the OS group which is to be granted SYSRAC privileges.
 #------------------------------------------------------------------------------
 oracle.install.db.OSRACDBA_GROUP=dba
+################################################################################
+#                                                                              #
+#                      Root script execution configuration                     #
+#                                                                              #
+################################################################################
+
+#-------------------------------------------------------------------------------------------------------
+# Specify the root script execution mode.
+#
+#   - true  : To execute the root script automatically by using the appropriate configuration methods.
+#   - false : To execute the root script manually.
+#
+# If this option is selected, password should be specified on the console.
+#-------------------------------------------------------------------------------------------------------
+oracle.install.db.rootconfig.executeRootScript=false
+
+#--------------------------------------------------------------------------------------
+# Specify the configuration method to be used for automatic root script execution.
+#
+# Following are the possible choices:
+#   - ROOT
+#   - SUDO
+#--------------------------------------------------------------------------------------
+oracle.install.db.rootconfig.configMethod=
+#--------------------------------------------------------------------------------------
+# Specify the absolute path of the sudo program.
+#
+# Applicable only when SUDO configuration method was chosen.
+#--------------------------------------------------------------------------------------
+oracle.install.db.rootconfig.sudoPath=
+
+#--------------------------------------------------------------------------------------
+# Specify the name of the user who is in the sudoers list. 
+# Applicable only when SUDO configuration method was chosen.
+# Note:For Single Instance database installations,the sudo user name must be the username of the user installing the database.
+#--------------------------------------------------------------------------------------
+oracle.install.db.rootconfig.sudoUserName=
 
 ###############################################################################
 #                                                                             #

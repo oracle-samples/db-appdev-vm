@@ -31,6 +31,13 @@
 mv /tmp/thestdoutlog_`basename $0`_* ~oracle/log
 cd ~oracle
 zip -r log.zip log >/dev/null 2>&1
+FILE=log.zip
+if [ -f $FILE ]; then
+   echo "File $FILE exists."
+else
+   echo "File $FILE does not exist."
+   touch log.zip
+fi
 chmod 777 log.zip
 chown oracle log.zip
 rm -rf ~oracle/log

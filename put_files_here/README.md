@@ -2,8 +2,10 @@
 
 Required Files
 --------------
-* OracleLinux-R7-U3-Server-x86_64-dvd.iso (needs to be this exactly md5 checked)
-* linux\*122*_database.zip (12201 has been verified - silent install may be incompatible with later versions)
+* OracleLinux-R8-U7-x86_64-dvd.iso (needs to be this exactly md5 checked)
+*  oracle-ai-database-free-26ai-23.26.0-1.el8.x86_64.rpm - available from https://www.oracle.com/database/technologies/free-downloads.html
+* oracle-ai-database-preinstall-26ai-1.0-1.el8.x86_64.rpm - available from https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/ 
+
 
 Optional Downloads
 --------------
@@ -20,4 +22,3 @@ If these files are available in the **put_files_here** directory, the build will
 * storm.zip - **exp dump of non sensative material. For geo location optional demo.**
 * reset_xmldbjson
 * master.zip - **Oracle Sample Schema**
-
